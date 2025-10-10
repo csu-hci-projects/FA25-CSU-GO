@@ -27,6 +27,13 @@ public class AdsController : MonoBehaviour
     [Range(0f,1f)]
     public float aimRecoilMultiplier = 0.6f; // 0 = no recoil, 1 = full recoil
 
+    [Header("Absolute Control")]
+    [Tooltip("If true, when aimed past the threshold the ADS pose overrides other scripts (set in LateUpdate).")]
+    public bool absoluteWhenAiming = true;
+    [Range(0.5f, 1f)] public float absoluteThreshold = 0.98f;
+    [Tooltip("Behaviours to temporarily disable while fully aimed (e.g., tilt sway)")]
+    public Behaviour[] disableWhileAiming;
+
     // internals
     Vector3 wrPosHome;
     Quaternion wrRotHome;
@@ -69,16 +76,6 @@ public class AdsController : MonoBehaviour
         var sway = GetComponentInChildren<PlayerModelIdleSway>();
     if (sway) sway.SetAimWeight(currentWeight);
 
-        // apply weaponRoot local transform blend
-        if (weaponRoot)
-        {
-            Vector3 targetPos = wrPosHome + aimLocalPosition;
-            Quaternion targetRot = wrRotHome * Quaternion.Euler(aimLocalEuler);
-
-            weaponRoot.localPosition = Vector3.Lerp(weaponRoot.localPosition, Vector3.Lerp(wrPosHome, targetPos, currentWeight), Time.deltaTime * aimSpeed * 4f);
-            weaponRoot.localRotation = Quaternion.Slerp(weaponRoot.localRotation, Quaternion.Slerp(wrRotHome, targetRot, currentWeight), Time.deltaTime * aimSpeed * 4f);
-        }
-
         // apply camera FOV
         if (cam)
         {
@@ -93,6 +90,47 @@ public class AdsController : MonoBehaviour
                 prop.SetValue(fpsShootScript, currentWeight);
 
             // or if fpsShootScript exposes a property/method, call it instead
+        }
+
+        // enable/disable optional behaviours based on absolute aim
+        bool fullyAimed = absoluteWhenAiming && currentWeight >= absoluteThreshold;
+        if (disableWhileAiming != null)
+        {
+            for (int i = 0; i < disableWhileAiming.Length; i++)
+            {
+                if (!disableWhileAiming[i]) continue;
+                disableWhileAiming[i].enabled = !fullyAimed;
+            }
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (!weaponRoot) return;
+
+        Vector3 targetPos = wrPosHome + aimLocalPosition;
+        Quaternion targetRot = wrRotHome * Quaternion.Euler(aimLocalEuler);
+
+        bool fullyAimed = absoluteWhenAiming && currentWeight >= absoluteThreshold;
+
+        if (fullyAimed)
+        {
+            // Absolute override so ADS wins over sway/recoil scripts that also write in Update
+            weaponRoot.localPosition = targetPos;
+            weaponRoot.localRotation = targetRot;
+        }
+        else
+        {
+            // Smooth blend while transitioning
+            float k = Time.deltaTime * aimSpeed * 4f;
+            weaponRoot.localPosition = Vector3.Lerp(
+                weaponRoot.localPosition,
+                Vector3.Lerp(wrPosHome, targetPos, currentWeight),
+                k);
+            weaponRoot.localRotation = Quaternion.Slerp(
+                weaponRoot.localRotation,
+                Quaternion.Slerp(wrRotHome, targetRot, currentWeight),
+                k);
         }
     }
 

@@ -54,9 +54,27 @@ public class FpsGunShootAnim : MonoBehaviour
     Vector3 recoilPos;        // local positional offset (for recoilTarget)
     Vector2 recoilAngles;     // yaw(x)/pitch(y) degrees (for recoilTarget)
 
+    [Header("Weapon local recoil (additive)")]
+    [Tooltip("Optional child under WeaponRoot used for additive local recoil (so ADS can stay absolute on WeaponRoot).")]
+    public Transform weaponLocalRecoil;
+    public float weaponKick = 0.012f;
+    public Vector2 weaponYawPitch = new(0.35f, -0.9f);
+    public float weaponReturnSharpness = 28f;
+    public float weaponSnapSharpness = 36f;
+    Vector3 wlrPosHome; Quaternion wlrRotHome;
+    Vector3 weaponRecoilPos; Vector2 weaponRecoilAngles;
+    Vector3 wlrTargetPos; Quaternion wlrTargetRot;
+
     void Awake()
     {
         if (!recoilTarget) recoilTarget = weaponRoot; // fallback if not set
+        // If recoilTarget points to the same transform AdsController drives (weaponRoot),
+        // use the parent so ADS absolute pose doesn't overwrite recoil.
+        if (recoilTarget == weaponRoot && weaponRoot && weaponRoot.parent)
+        {
+            Debug.LogWarning("FpsGunShootAnim: recoilTarget == weaponRoot; using parent for recoil so ADS can be absolute without killing recoil.");
+            recoilTarget = weaponRoot.parent;
+        }
 
         rtPosHome = recoilTarget.localPosition;
         rtRotHome = recoilTarget.localRotation;
@@ -67,6 +85,12 @@ public class FpsGunShootAnim : MonoBehaviour
             wrRotHome = weaponRoot.localRotation;
         }
         if (slide) slideHome = slide.localPosition;
+
+        if (weaponLocalRecoil)
+        {
+            wlrPosHome = weaponLocalRecoil.localPosition;
+            wlrRotHome = weaponLocalRecoil.localRotation;
+        }
     }
 
     void Update()
@@ -149,6 +173,29 @@ public class FpsGunShootAnim : MonoBehaviour
             e.x = Mathf.Lerp(e.x, 0f, Time.deltaTime * cameraReturn);
             cameraPitch.localEulerAngles = new Vector3(e.x, 0f, 0f);
         }
+
+        // --- WEAPON LOCAL RECOIL (compute target; apply in LateUpdate so it layers after ADS) ---
+        if (weaponLocalRecoil)
+        {
+            float retW  = 1f - Mathf.Exp(-weaponReturnSharpness * dt);
+            float snapW = 1f - Mathf.Exp(-weaponSnapSharpness   * dt);
+
+            weaponRecoilPos    = Vector3.Lerp(weaponRecoilPos,    Vector3.zero, retW);
+            weaponRecoilAngles = Vector2.Lerp(weaponRecoilAngles, Vector2.zero, retW);
+
+            Vector3 addPos = weaponRecoilPos;
+            Quaternion addRot =
+                Quaternion.Euler(weaponRecoilAngles.y, 0f, 0f) *
+                Quaternion.Euler(0f, -weaponRecoilAngles.x, 0f);
+
+            // Build targets relative to the local recoil node home
+            wlrTargetPos = wlrPosHome + addPos;
+            wlrTargetRot = addRot * wlrRotHome;
+
+            // Optionally pre-snap a bit in Update to reduce visible lag if LateUpdate order changes
+            weaponLocalRecoil.localPosition = Vector3.Lerp(weaponLocalRecoil.localPosition, wlrTargetPos, snapW * 0.5f);
+            weaponLocalRecoil.localRotation = Quaternion.Slerp(weaponLocalRecoil.localRotation, wlrTargetRot, snapW * 0.5f);
+        }
     }
 
     public void Fire()
@@ -163,5 +210,97 @@ public class FpsGunShootAnim : MonoBehaviour
 
         if (cameraPitch) cameraPitch.localRotation *= Quaternion.Euler(-cameraKick, 0f, 0f);
         // FX hooks here
+
+        // --- HITSCAN / BULLET HOLES ---
+        TryHitscan();
+
+        // Add an extra local kick on the weapon for a richer feel
+        if (weaponLocalRecoil)
+        {
+            float kw = Mathf.Lerp(1f, aimRecoilMultiplier, aimWeight);
+            weaponRecoilPos    += Vector3.back * weaponKick * kw;
+            weaponRecoilAngles += weaponYawPitch * kw;
+        }
+    }
+
+    [Header("Hitscan")]
+    [Tooltip("Camera used for screen-center raycasting. If empty, falls back to Camera.main")] public Camera shootCamera;
+    [Tooltip("Barrel/muzzle tip; if set, rays are cast from here using its forward direction")] public Transform muzzle;
+    [Tooltip("Max ray distance")] public float hitscanRange = 200f;
+    [Tooltip("Damage applied to IDamageable targets")] public float damage = 10f;
+    [Tooltip("Physics impulse applied to rigidbodies along shot direction")] public float impactImpulse = 4f;
+    [Tooltip("Layers the hitscan should collide with")] public LayerMask hitMask = ~0;
+    [Header("Bullet Hole")]
+    [Tooltip("Prefab of a small quad/decal aligned to the surface normal")] public GameObject bulletHolePrefab;
+    [Tooltip("Seconds before hole auto-destroys (<=0 means keep)")] public float bulletHoleLifetime = 20f;
+    [Tooltip("Local uniform scale for spawned bullet hole")] public float bulletHoleScale = 1f;
+    [Tooltip("Offset along normal to avoid z-fighting")] public float bulletHoleSurfaceOffset = 0.002f;
+
+    void TryHitscan()
+    {
+        Ray ray;
+        if (muzzle != null)
+        {
+            ray = new Ray(muzzle.position, muzzle.forward);
+        }
+        else
+        {
+            Camera cam = shootCamera != null ? shootCamera : Camera.main;
+            if (cam == null) return; // no camera available
+            Vector3 screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f);
+            ray = cam.ScreenPointToRay(screenCenter);
+        }
+
+        if (Physics.Raycast(ray, out RaycastHit hit, hitscanRange, hitMask, QueryTriggerInteraction.Ignore))
+        {
+            // Apply physics impulse
+            if (hit.rigidbody)
+            {
+                hit.rigidbody.AddForceAtPosition(ray.direction * impactImpulse, hit.point, ForceMode.Impulse);
+            }
+
+            // Apply damage if the target supports it
+            var damageable = hit.collider.GetComponentInParent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.ApplyDamage(damage, hit);
+            }
+
+            // Spawn bullet hole
+            if (bulletHolePrefab != null)
+            {
+                Vector3 pos = hit.point + hit.normal * Mathf.Max(0f, bulletHoleSurfaceOffset);
+                // Face the shooter: flip so the quad's front side looks toward the ray origin
+                Quaternion rot = Quaternion.LookRotation(-hit.normal, Vector3.up);
+
+                GameObject hole = Instantiate(bulletHolePrefab, pos, rot);
+
+                // Randomize rotation around normal so holes don't all look identical
+                hole.transform.Rotate(Vector3.forward, Random.Range(0f, 360f), Space.Self);
+
+                // Parent to the hit object so it follows moving targets
+                hole.transform.SetParent(hit.collider.transform, true);
+
+                if (bulletHoleScale > 0f)
+                {
+                    hole.transform.localScale = Vector3.one * bulletHoleScale;
+                }
+
+                if (bulletHoleLifetime > 0f)
+                {
+                    Destroy(hole, bulletHoleLifetime);
+                }
+            }
+        }
+    }
+
+    void LateUpdate()
+    {
+        // Apply local weapon recoil after ADS likely set WeaponRoot in its LateUpdate
+        if (weaponLocalRecoil)
+        {
+            weaponLocalRecoil.localPosition = wlrTargetPos;
+            weaponLocalRecoil.localRotation = wlrTargetRot;
+        }
     }
 }
