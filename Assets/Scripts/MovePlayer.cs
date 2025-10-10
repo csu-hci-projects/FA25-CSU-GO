@@ -124,8 +124,11 @@ public class PlayerMovementFPSBhop : MonoBehaviour
 
         if (cameraTransform)
         {
-            camFwdXZ = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
-            camRightXZ = Vector3.ProjectOnPlane(cameraTransform.right,  Vector3.up).normalized;
+            // Use yaw-only basis so movement stays horizontal and fully camera-relative
+            float yaw = cameraTransform.eulerAngles.y;
+            Quaternion yawRot = Quaternion.Euler(0f, yaw, 0f);
+            camFwdXZ = yawRot * Vector3.forward;
+            camRightXZ = yawRot * Vector3.right;
         }
 
         // Build camera-relative move dir using latest camera pose
