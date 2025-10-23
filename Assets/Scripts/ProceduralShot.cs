@@ -238,6 +238,12 @@ public class FpsGunShootAnim : MonoBehaviour
     [Tooltip("If true, parent spawned holes to the hit collider so they follow moving objects. If false, holes are left unparented and use absolute world size.")]
     public bool bulletHoleParentToTarget = false;
 
+    [Header("Live Aim Dot")]
+    [Tooltip("Spawner that will render a UI dot at the predicted impact point on screen.")]
+    public ScreenDotSpawner screenDotSpawner;
+    [Tooltip("Enable a live 2D dot that shows where the current shot will hit (accounts for recoil/weapon pose).")]
+    public bool showLiveAimDot = false;
+
     void TryHitscan()
     {
         Ray ray;

@@ -12,6 +12,10 @@ public class PlayerMovementFPSBhop : MonoBehaviour
     [Header("Movement")]
     [Tooltip("Base walk speed (before bhop bonus).")]
     public float moveSpeed = 6f;
+    [Tooltip("Layers considered obstacles for immediate movement blocking checks.")]
+    public LayerMask obstacleMask = ~0;
+    [Tooltip("Distance to check in front of the player for an immediate obstacle that should prevent snapping to full speed (meters).")]
+    public float obstacleCheckDistance = 0.35f;
 
     [Header("Jump")]
     [Tooltip("Upward impulse for a single, consistent jump.")]
@@ -164,8 +168,39 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         if (isGrounded)
         {
             Vector3 targetXZ = wishDir * effectiveSpeed;
-            v.x = targetXZ.x;
-            v.z = targetXZ.z;
+
+            // If there's an immediate obstacle in the wish direction, avoid snapping _up_ to full speed
+            // because a collision may have reduced current horizontal velocity. In that case, cap
+            // the target magnitude to the current horizontal magnitude so we don't magically push through.
+            if (wishDir.sqrMagnitude > 1e-6f)
+            {
+                // perform a short raycast to detect blocking geometry in movement direction
+                Vector3 rayOrigin = transform.position + Vector3.up * 0.1f; // small offset so ground colliders aren't hit
+                RaycastHit obsHit;
+                bool blocked = Physics.Raycast(rayOrigin, wishDir, out obsHit, obstacleCheckDistance, obstacleMask, QueryTriggerInteraction.Ignore);
+
+                if (blocked)
+                {
+                    Vector3 curHoriz = new Vector3(v.x, 0f, v.z);
+                    float curMag = curHoriz.magnitude;
+                    // Do not increase speed when blocked; allow reduction or maintain current speed
+                    float cappedMag = Mathf.Min(curMag, effectiveSpeed);
+                    Vector3 cappedTarget = wishDir * cappedMag;
+                    v.x = cappedTarget.x;
+                    v.z = cappedTarget.z;
+                }
+                else
+                {
+                    v.x = targetXZ.x;
+                    v.z = targetXZ.z;
+                }
+            }
+            else
+            {
+                // no input: come to rest horizontally
+                v.x = targetXZ.x;
+                v.z = targetXZ.z;
+            }
         }
         else
         {
