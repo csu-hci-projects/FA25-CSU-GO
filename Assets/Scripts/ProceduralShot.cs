@@ -235,6 +235,8 @@ public class FpsGunShootAnim : MonoBehaviour
     [Tooltip("Seconds before hole auto-destroys (<=0 means keep)")] public float bulletHoleLifetime = 20f;
     [Tooltip("Local uniform scale for spawned bullet hole")] public float bulletHoleScale = 1f;
     [Tooltip("Offset along normal to avoid z-fighting")] public float bulletHoleSurfaceOffset = 0.002f;
+    [Tooltip("If true, parent spawned holes to the hit collider so they follow moving objects. If false, holes are left unparented and use absolute world size.")]
+    public bool bulletHoleParentToTarget = false;
 
     void TryHitscan()
     {
@@ -270,20 +272,36 @@ public class FpsGunShootAnim : MonoBehaviour
             if (bulletHolePrefab != null)
             {
                 Vector3 pos = hit.point + hit.normal * Mathf.Max(0f, bulletHoleSurfaceOffset);
-                // Face the shooter: flip so the quad's front side looks toward the ray origin
+                // Face the surface: front side points toward the ray origin
                 Quaternion rot = Quaternion.LookRotation(-hit.normal, Vector3.up);
 
                 GameObject hole = Instantiate(bulletHolePrefab, pos, rot);
 
-                // Randomize rotation around normal so holes don't all look identical
-                hole.transform.Rotate(Vector3.forward, Random.Range(0f, 360f), Space.Self);
+                // Randomize rotation around normal so holes don't look identical
+                hole.transform.Rotate(hit.normal, Random.Range(0f, 360f), Space.World);
 
-                // Parent to the hit object so it follows moving targets
-                hole.transform.SetParent(hit.collider.transform, true);
-
-                if (bulletHoleScale > 0f)
+                // If user wants absolute-size holes that are NOT affected by the hit object's scale,
+                // do not parent the hole and set its world scale directly.
+                if (!bulletHoleParentToTarget)
                 {
-                    hole.transform.localScale = Vector3.one * bulletHoleScale;
+                    // When unparented, localScale == world scale, so set localScale to desired world size
+                    if (bulletHoleScale > 0f)
+                        hole.transform.localScale = Vector3.one * bulletHoleScale;
+                }
+                else
+                {
+                    // Parent to the hit object so it follows moving targets, but compensate for parent scale
+                    hole.transform.SetParent(hit.collider.transform, true);
+
+                    if (bulletHoleScale > 0f)
+                    {
+                        // Compute a uniform scale that preserves circular shape in world space by using
+                        // the largest absolute component of the parent's lossyScale.
+                        Vector3 parentScale = hit.collider.transform.lossyScale;
+                        float maxParent = Mathf.Max(Mathf.Max(Mathf.Abs(parentScale.x), Mathf.Abs(parentScale.y)), Mathf.Abs(parentScale.z));
+                        float uniformScale = (maxParent > 0f) ? (bulletHoleScale / maxParent) : bulletHoleScale;
+                        hole.transform.localScale = Vector3.one * uniformScale;
+                    }
                 }
 
                 if (bulletHoleLifetime > 0f)
