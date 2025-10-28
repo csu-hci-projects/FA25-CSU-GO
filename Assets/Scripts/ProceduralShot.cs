@@ -214,6 +214,22 @@ public class FpsGunShootAnim : MonoBehaviour
         // --- HITSCAN / BULLET HOLES ---
         TryHitscan();
 
+        // --- MUZZLE FLASH ---
+        if (muzzle != null && muzzleFlashPrefab != null)
+        {
+            // Position slightly in front of the muzzle to avoid z-fighting with the barrel
+            Vector3 fxPos = muzzle.position + muzzle.forward * muzzleFlashForwardOffset;
+            Quaternion fxRot = Quaternion.LookRotation(muzzle.forward, muzzle.up);
+
+            GameObject fx = Instantiate(muzzleFlashPrefab, fxPos, fxRot);
+
+            if (parentMuzzleFlashToMuzzle)
+                fx.transform.SetParent(muzzle, true);
+
+            if (muzzleFlashLifetime > 0f)
+                Destroy(fx, muzzleFlashLifetime);
+        }
+
         // Add an extra local kick on the weapon for a richer feel
         if (weaponLocalRecoil)
         {
@@ -243,6 +259,16 @@ public class FpsGunShootAnim : MonoBehaviour
     public ScreenDotSpawner screenDotSpawner;
     [Tooltip("Enable a live 2D dot that shows where the current shot will hit (accounts for recoil/weapon pose).")]
     public bool showLiveAimDot = false;
+
+    [Header("Muzzle FX")]
+    [Tooltip("Prefab for the muzzle flash particle/object that should spawn at the barrel/muzzle when firing.")]
+    public GameObject muzzleFlashPrefab;
+    [Tooltip("Seconds before muzzle flash object auto-destroys (<=0 means keep)")]
+    public float muzzleFlashLifetime = 0.6f;
+    [Tooltip("Offset forward from the muzzle transform along its forward vector to place the flash (meters).")]
+    public float muzzleFlashForwardOffset = 0.04f;
+    [Tooltip("If true, parent the spawned muzzle flash to the muzzle transform (keeps it attached to moving gun).")]
+    public bool parentMuzzleFlashToMuzzle = false;
 
     void TryHitscan()
     {

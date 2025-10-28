@@ -424,7 +424,7 @@ Transform:
   m_GameObject: {fileID: 235815295317865782}
   serializedVersion: 2
   m_LocalRotation: {x: -0.4485622, y: -0.89126354, z: -0.06482632, w: 0.015457318}
-  m_LocalPosition: {x: 0.074, y: 0.0927, z: -0.2955}
+  m_LocalPosition: {x: 0.0733, y: 0.0764, z: -0.1746}
   m_LocalScale: {x: 0.7692304, y: 0.7692308, z: 0.76923025}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1632,8 +1632,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3142371348395727917}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.07812967, y: 0.196953, z: -0.028114242, w: 0.97689044}
-  m_LocalPosition: {x: 7.105427e-16, y: -7.105427e-17, z: -0.25431645}
+  m_LocalRotation: {x: -0.07846925, y: 0.1849336, z: -0.02715201, w: 0.97923696}
+  m_LocalPosition: {x: -0.004274279, y: 0.00023978204, z: -0.25350687}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1644,7 +1644,7 @@ Transform:
   - {fileID: 849013071695538756}
   - {fileID: 4906870194511346774}
   m_Father: {fileID: 1228024927066803892}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -8.258, y: 21.733, z: -4.765}
 --- !u!1 &3172270714616946857
 GameObject:
   m_ObjectHideFlags: 0
@@ -3368,7 +3368,11 @@ MonoBehaviour:
   bulletHoleSurfaceOffset: 0.002
   bulletHoleParentToTarget: 0
   screenDotSpawner: {fileID: 0}
-  showLiveAimDot: 0
+  showLiveAimDot: 1
+  muzzleFlashPrefab: {fileID: 371707642991839552, guid: c24eb860c4529f245bb789cd824b3bad, type: 3}
+  muzzleFlashLifetime: 0.12
+  muzzleFlashForwardOffset: 0.04
+  parentMuzzleFlashToMuzzle: 1
 --- !u!114 &9123228050440538714
 MonoBehaviour:
   m_ObjectHideFlags: 0
