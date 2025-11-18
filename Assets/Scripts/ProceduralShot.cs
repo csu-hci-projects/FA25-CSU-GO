@@ -38,6 +38,16 @@ public class FpsGunShootAnim : MonoBehaviour
     public float cameraKick = 0.6f;
     public float cameraReturn = 12f;
 
+    [Header("Scoring")]
+    [Tooltip("Points awarded when killing an Enemy-tagged object.")]
+    public int enemyKillPoints = 100;
+
+    [Tooltip("Points awarded when killing a Fleer-tagged object.")]
+    public int fleerKillPoints = 50;
+
+    [Tooltip("Points awarded when hitting a generic damageable (if you want per-hit score).")]
+    public int damageHitPoints = 10;
+
     [HideInInspector] public float aimWeight = 0f; // 0..1, set by AdsController
     [Header("Aim tuning")]
     [Range(0f,1f)]
@@ -285,27 +295,37 @@ public class FpsGunShootAnim : MonoBehaviour
             ray = cam.ScreenPointToRay(screenCenter);
         }
 
-        if (Physics.Raycast(ray, out RaycastHit hit, hitscanRange, hitMask, QueryTriggerInteraction.Ignore))
-        {
-            // Check if hit an enemy or fleer ball - destroy it
+        if (Physics.Raycast(ray, out RaycastHit hit, hitscanRange, hitMask, QueryTriggerInteraction.Ignore)){
             if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Fleer"))
             {
+                if (ScoreManager.Instance != null)
+                {
+                    int points =
+                        hit.collider.CompareTag("Enemy")
+                        ? enemyKillPoints
+                        : fleerKillPoints;
+
+                    ScoreManager.Instance.AddPoints(points);
+                }
+
                 Destroy(hit.collider.gameObject);
-                // Don't spawn bullet hole on enemies
                 return;
             }
 
-            // Apply physics impulse
             if (hit.rigidbody)
             {
                 hit.rigidbody.AddForceAtPosition(ray.direction * impactImpulse, hit.point, ForceMode.Impulse);
             }
 
-            // Apply damage if the target supports it
             var damageable = hit.collider.GetComponentInParent<IDamageable>();
             if (damageable != null)
             {
                 damageable.ApplyDamage(damage, hit);
+
+                if (ScoreManager.Instance != null && damageHitPoints > 0)
+                {
+                    ScoreManager.Instance.AddPoints(damageHitPoints);
+                }
             }
 
             // Spawn bullet hole
