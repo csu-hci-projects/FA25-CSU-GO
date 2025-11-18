@@ -287,6 +287,14 @@ public class FpsGunShootAnim : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, hitscanRange, hitMask, QueryTriggerInteraction.Ignore))
         {
+            // Check if hit an enemy or fleer ball - destroy it
+            if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Fleer"))
+            {
+                Destroy(hit.collider.gameObject);
+                // Don't spawn bullet hole on enemies
+                return;
+            }
+
             // Apply physics impulse
             if (hit.rigidbody)
             {

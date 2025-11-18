@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -8,6 +9,10 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] int currentHealth = MaxHealth;
     [SerializeField] Slider healthSlider;
     [SerializeField] TextMeshProUGUI healthLabel;
+    [SerializeField] string gameOverSceneName = ""; // if empty, reloads current scene
+    [SerializeField] float deathDelay = 0.5f;
+
+    bool isDead = false;
 
     void Awake()
     {
@@ -22,7 +27,7 @@ public class PlayerHealth : MonoBehaviour
         UpdateUI();
         if (currentHealth <= 0)
         {
-            // TODO: trigger death/respawn logic here.
+            HandleDeath();
         }
     }
 
@@ -37,5 +42,31 @@ public class PlayerHealth : MonoBehaviour
     {
         if (healthSlider) healthSlider.value = (float)currentHealth / MaxHealth;
         if (healthLabel) healthLabel.text = $"{currentHealth} / {MaxHealth}";
+    }
+
+    void HandleDeath()
+    {
+        if (isDead) return;
+        isDead = true;
+        if (deathDelay > 0f)
+        {
+            Invoke(nameof(LoadGameOverScene), deathDelay);
+        }
+        else
+        {
+            LoadGameOverScene();
+        }
+    }
+
+    void LoadGameOverScene()
+    {
+        if (!string.IsNullOrEmpty(gameOverSceneName))
+        {
+            SceneManager.LoadScene(gameOverSceneName);
+            return;
+        }
+
+        var active = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(active.name);
     }
 }
