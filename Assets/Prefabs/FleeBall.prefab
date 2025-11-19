@@ -132,7 +132,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5677334516912223365}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1d78b8a3694aaa2479931c77d12dde18, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -191,6 +191,7 @@ MonoBehaviour:
   moveForce: 30
   maxSpeed: 20
   searchSamples: 50
+  loseInterestTime: 2
   pathUpdateInterval: 0.3
   waypointReachDistance: 1.5
   explosionPrefab: {fileID: 100006, guid: a49596ebf788acd4ab1281bffea444b1, type: 3}
@@ -209,9 +210,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 117d070b83588c04aa630e48839076ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallDustEffect
-  dustPrefab: {fileID: 100000, guid: 902406362f09aa2488ee3d65e2fd6aa3, type: 3}
+  dustPrefab: {fileID: 100000, guid: 5a4630d3d41eb154fb963600cf40e826, type: 3}
   prefabScale: 0.3
-  minSpeedForDust: 0.5
+  minSpeedForDust: 8
   spawnInterval: 0.07
   spawnDelay: 0.2
   spawnOffset: {x: 0, y: 0, z: 0}
@@ -221,5 +222,5 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  overrideLifetime: 0
-  destroyAfterSeconds: 1
+  overrideLifetime: 1
+  destroyAfterSeconds: 2

@@ -3235,6 +3235,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2889288160028904590, guid: 9a906356721b8c7419845e6ba6afc03c, type: 3}
+      propertyPath: m_Intensity
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6654893410515566851, guid: 9a906356721b8c7419845e6ba6afc03c, type: 3}
       propertyPath: m_Name
       value: AmmoDrop
@@ -3292,10 +3296,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1295368310099734065, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
-      propertyPath: agentRadius
-      value: 0.8
-      objectReference: {fileID: 0}
     - target: {fileID: 2225177461522701363, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.1
@@ -3336,18 +3336,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3170576475408001938, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
-      propertyPath: dustPS
-      value: 
-      objectReference: {fileID: 19800000, guid: c380d2dd36b7ec44cb9ea6098511faa9, type: 3}
-    - target: {fileID: 3170576475408001938, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
-      propertyPath: minSpeedForDust
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4398884963310929844, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 13400000, guid: 1d78b8a3694aaa2479931c77d12dde18, type: 2}
     - target: {fileID: 4869017589782460716, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
       propertyPath: m_Name
       value: FleeBall
@@ -3365,66 +3353,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: maxSpeed
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: jumpForce
-      value: 21
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: moveForce
-      value: 35
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: agentRadius
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: explosionForce
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: explosionScale
-      value: 1.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: explosionPrefab
-      value: 
-      objectReference: {fileID: 100006, guid: a49596ebf788acd4ab1281bffea444b1, type: 3}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: explosionUpBoost
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: knockbackMaxUpSpeed
-      value: 18
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: waypointCommitDuration
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: obstacleAvoidanceStrength
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: obstacleDetectionDistance
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: knockbackMaxHorizontalSpeed
-      value: 18
-      objectReference: {fileID: 0}
     - target: {fileID: 2821268239385096503, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
       propertyPath: m_Name
       value: EnemyBall
       objectReference: {fileID: 0}
-    - target: {fileID: 8375072873436441938, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 13400000, guid: 1d78b8a3694aaa2479931c77d12dde18, type: 2}
     - target: {fileID: 9157218050867384108, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -7.21756
@@ -3463,18 +3395,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9157218050867384108, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9223322008830706856, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: dustPS
-      value: 
-      objectReference: {fileID: 19800000, guid: 902406362f09aa2488ee3d65e2fd6aa3, type: 3}
-    - target: {fileID: 9223322008830706856, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: minSpeedForDust
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 9223322008830706856, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-      propertyPath: overrideLifetime
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -3657,6 +3577,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4639400466219882461, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
+      propertyPath: m_Intensity
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5

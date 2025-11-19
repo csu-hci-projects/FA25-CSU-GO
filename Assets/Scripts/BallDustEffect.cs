@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 public class BallDustEffect : MonoBehaviour
@@ -10,7 +9,7 @@ public class BallDustEffect : MonoBehaviour
 
     [Header("Spawn Logic")] 
     [SerializeField] float minSpeedForDust = 0.5f; // minimum horizontal speed to spawn dust
-    [SerializeField] float spawnInterval = 0.4f;   // how often to spawn
+    [SerializeField] float spawnInterval = 0.2f;   // how often to spawn
     [SerializeField] float spawnDelay = 0.2f;      // spawn at the position from this many seconds ago
     [SerializeField] Vector3 spawnOffset = new Vector3(0f, 0f, 0f); // additional world offset
 
@@ -23,22 +22,16 @@ public class BallDustEffect : MonoBehaviour
     [Header("Lifetime Override (Optional)")]
     [SerializeField] bool overrideLifetime = false;
     [SerializeField] float destroyAfterSeconds = 3f;
-    [SerializeField] int initialPoolSize = 6;
 
     struct PosSample { public float t; public Vector3 pos; }
 
     Rigidbody rb;
     List<PosSample> samples = new List<PosSample>(128);
     float nextSpawnTime = 0f;
-    readonly Queue<GameObject> pool = new Queue<GameObject>();
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        if (dustPrefab != null)
-        {
-            PrewarmPool();
-        }
     }
 
     void Update()
@@ -96,86 +89,22 @@ public class BallDustEffect : MonoBehaviour
 
         spawnPos += spawnOffset;
 
-        // Spawn the WARFX prefab from the pool at the historical position (not parented)
-        GameObject fx = GetFromPool();
-        fx.transform.SetPositionAndRotation(spawnPos, rot);
+        // Spawn the WARFX prefab at the historical position (not parented)
+        GameObject fx = Instantiate(dustPrefab, spawnPos, rot);
         fx.transform.localScale = Vector3.one * prefabScale;
 
         // Ensure it plays if it has a particle system
         var ps = fx.GetComponent<ParticleSystem>();
         if (ps == null) ps = fx.GetComponentInChildren<ParticleSystem>();
-        if (ps != null)
-        {
-            ps.Clear();
-            ps.Play();
-        }
+        if (ps != null && !ps.isPlaying) ps.Play();
 
-        // Determine when to return the instance to the pool
-        float releaseDelay = overrideLifetime ? destroyAfterSeconds : EstimateLifetime(ps);
-        StartCoroutine(ReturnAfterDelay(fx, releaseDelay));
+        // Optional lifetime override (in case prefab doesn't self-destroy)
+        if (overrideLifetime)
+        {
+            Destroy(fx, destroyAfterSeconds);
+        }
 
         // Schedule next spawn
         nextSpawnTime = Time.time + spawnInterval;
-    }
-
-    void PrewarmPool()
-    {
-        for (int i = pool.Count; i < Mathf.Max(1, initialPoolSize); i++)
-        {
-            GameObject fx = Instantiate(dustPrefab);
-            fx.SetActive(false);
-            pool.Enqueue(fx);
-        }
-    }
-
-    GameObject GetFromPool()
-    {
-        if (pool.Count == 0)
-        {
-            GameObject created = Instantiate(dustPrefab);
-            created.SetActive(false);
-            pool.Enqueue(created);
-        }
-
-        GameObject instance = pool.Dequeue();
-        instance.SetActive(true);
-        return instance;
-    }
-
-    IEnumerator ReturnAfterDelay(GameObject fx, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        ReturnToPool(fx);
-    }
-
-    void ReturnToPool(GameObject fx)
-    {
-        if (fx == null) return;
-        var ps = fx.GetComponent<ParticleSystem>();
-        if (ps == null) ps = fx.GetComponentInChildren<ParticleSystem>();
-        if (ps != null)
-        {
-            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        }
-        fx.SetActive(false);
-        pool.Enqueue(fx);
-    }
-
-    float EstimateLifetime(ParticleSystem ps)
-    {
-        if (ps == null)
-        {
-            return destroyAfterSeconds;
-        }
-
-        var main = ps.main;
-        float startLifetime = main.startLifetime.constantMax;
-        if (startLifetime <= 0f)
-        {
-            startLifetime = main.startLifetime.Evaluate(1f);
-        }
-
-        float lifetime = main.duration + Mathf.Abs(startLifetime);
-        return Mathf.Max(0.1f, lifetime);
     }
 }

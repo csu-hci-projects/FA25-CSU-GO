@@ -132,7 +132,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4810899073226687505}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1d78b8a3694aaa2479931c77d12dde18, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -187,26 +187,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBall
   detectionRange: 256
   stopRange: 1.5
-  moveForce: 50
-  maxSpeed: 12
-  explosionPrefab: {fileID: 100006, guid: 28ccd38a41e256a4e8fea96f5a8d039d, type: 3}
+  moveForce: 35
+  maxSpeed: 15
+  sightHeight: 0.75
+  losObstructionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  explosionPrefab: {fileID: 100006, guid: a49596ebf788acd4ab1281bffea444b1, type: 3}
   explosionFxLifetime: 4
-  explosionScale: 1
+  explosionScale: 1.4
   explosionForce: 2
-  explosionUpBoost: 0.05
+  explosionUpBoost: 2
   explosionRadius: 2.1
   explosionDamage: 10
-  knockbackMaxHorizontalSpeed: 8
-  knockbackMaxUpSpeed: 2
+  knockbackMaxHorizontalSpeed: 18
+  knockbackMaxUpSpeed: 18
   pathUpdateInterval: 0.4
   waypointReachDistance: 1.5
-  jumpForce: 15
-  jumpCooldown: 2
-  stuckTimeThreshold: 3
-  stuckDistanceThreshold: 2
-  minJumpInterval: 2
-  maxJumpInterval: 5
-  lungeJumpForce: 5
+  navMeshHeightOffset: 0.5
+  jumpInterval: 2.5
+  jumpForce: 21
 --- !u!114 &9223322008830706856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,9 +219,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 117d070b83588c04aa630e48839076ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallDustEffect
-  dustPrefab: {fileID: 100000, guid: 902406362f09aa2488ee3d65e2fd6aa3, type: 3}
+  dustPrefab: {fileID: 100000, guid: 5a4630d3d41eb154fb963600cf40e826, type: 3}
   prefabScale: 0.3
-  minSpeedForDust: 0.5
+  minSpeedForDust: 8
   spawnInterval: 0.07
   spawnDelay: 0.2
   spawnOffset: {x: 0, y: 0, z: 0}
@@ -231,5 +231,5 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  overrideLifetime: 0
-  destroyAfterSeconds: 1
+  overrideLifetime: 1
+  destroyAfterSeconds: 2
