@@ -208,6 +208,51 @@ public class FpsGunShootAnim : MonoBehaviour
         }
     }
 
+    [Header("Hitscan")]
+    [Tooltip("Camera used for screen-center raycasting. If empty, falls back to Camera.main")] public Camera shootCamera;
+    [Tooltip("Barrel/muzzle tip; if set, rays are cast from here using its forward direction")] public Transform muzzle;
+    [Tooltip("Max ray distance")] public float hitscanRange = 200f;
+    [Tooltip("Damage applied to IDamageable targets")] public float damage = 10f;
+    [Tooltip("Physics impulse applied to rigidbodies along shot direction")] public float impactImpulse = 4f;
+    [Tooltip("Layers the hitscan should collide with")] public LayerMask hitMask = ~0;
+    [Header("Bullet Hole")]
+    [Tooltip("Prefab of a small quad/decal aligned to the surface normal")] public GameObject bulletHolePrefab;
+    [Tooltip("Seconds before hole auto-destroys (<=0 means keep)")] public float bulletHoleLifetime = 20f;
+    [Tooltip("Local uniform scale for spawned bullet hole")] public float bulletHoleScale = 1f;
+    [Tooltip("Offset along normal to avoid z-fighting")] public float bulletHoleSurfaceOffset = 0.002f;
+    [Tooltip("If true, parent spawned holes to the hit collider so they follow moving objects. If false, holes are left unparented and use absolute world size.")]
+    public bool bulletHoleParentToTarget = false;
+    [Header("Impact FX")]
+    [Tooltip("Optional prefab (particle system/decal) that spawns at the same point as the bullet hole.")]
+    public GameObject bulletImpactPrefab;
+    [Tooltip("Seconds before the impact effect auto-destroys (<=0 means keep).")]
+    public float bulletImpactLifetime = 1.5f;
+
+    [Header("Live Aim Dot")]
+    [Tooltip("Spawner that will render a UI dot at the predicted impact point on screen.")]
+    public ScreenDotSpawner screenDotSpawner;
+    [Tooltip("Enable a live 2D dot that shows where the current shot will hit (accounts for recoil/weapon pose).")]
+    public bool showLiveAimDot = false;
+
+    [Header("Muzzle FX")]
+    [Tooltip("Prefab for the muzzle flash particle/object that should spawn at the barrel/muzzle when firing.")]
+    public GameObject muzzleFlashPrefab;
+    [Tooltip("Seconds before muzzle flash object auto-destroys (<=0 means keep)")]
+    public float muzzleFlashLifetime = 0.6f;
+    [Tooltip("Offset forward from the muzzle transform along its forward vector to place the flash (meters).")]
+    public float muzzleFlashForwardOffset = 0.04f;
+    [Tooltip("If true, parent the spawned muzzle flash to the muzzle transform (keeps it attached to moving gun).")]
+    public bool parentMuzzleFlashToMuzzle = false;
+    [Header("Tracer FX")]
+    [Tooltip("Prefab that holds a BulletTracer component (LineRenderer or trail that visualizes the shot path).")]
+    public BulletTracer tracerPrefab;
+    [Tooltip("If > 0, overrides the tracer prefab's lifetime in seconds.")]
+    public float tracerLifetimeOverride = -1f;
+    [Tooltip("Small offset applied along the muzzle forward so the tracer does not start inside the barrel.")]
+    public float tracerSpawnForwardOffset = 0.01f;
+    [Tooltip("Uniform scale applied to the tracer's trail width for this weapon.")]
+    public float tracerWidthMultiplier = 1f;
+
     public void Fire()
     {
         if (useSlide && slide) { slidePlaying = true; slideT = 0f; }
@@ -222,7 +267,10 @@ public class FpsGunShootAnim : MonoBehaviour
         // FX hooks here
 
         // --- HITSCAN / BULLET HOLES ---
-        TryHitscan();
+        TryHitscan(out Ray shotRay, out Vector3 tracerEndPoint);
+
+        // --- TRACER ---
+        SpawnTracer(shotRay, tracerEndPoint);
 
         // --- MUZZLE FLASH ---
         if (muzzle != null && muzzleFlashPrefab != null)
@@ -249,53 +297,46 @@ public class FpsGunShootAnim : MonoBehaviour
         }
     }
 
-    [Header("Hitscan")]
-    [Tooltip("Camera used for screen-center raycasting. If empty, falls back to Camera.main")] public Camera shootCamera;
-    [Tooltip("Barrel/muzzle tip; if set, rays are cast from here using its forward direction")] public Transform muzzle;
-    [Tooltip("Max ray distance")] public float hitscanRange = 200f;
-    [Tooltip("Damage applied to IDamageable targets")] public float damage = 10f;
-    [Tooltip("Physics impulse applied to rigidbodies along shot direction")] public float impactImpulse = 4f;
-    [Tooltip("Layers the hitscan should collide with")] public LayerMask hitMask = ~0;
-    [Header("Bullet Hole")]
-    [Tooltip("Prefab of a small quad/decal aligned to the surface normal")] public GameObject bulletHolePrefab;
-    [Tooltip("Seconds before hole auto-destroys (<=0 means keep)")] public float bulletHoleLifetime = 20f;
-    [Tooltip("Local uniform scale for spawned bullet hole")] public float bulletHoleScale = 1f;
-    [Tooltip("Offset along normal to avoid z-fighting")] public float bulletHoleSurfaceOffset = 0.002f;
-    [Tooltip("If true, parent spawned holes to the hit collider so they follow moving objects. If false, holes are left unparented and use absolute world size.")]
-    public bool bulletHoleParentToTarget = false;
-
-    [Header("Live Aim Dot")]
-    [Tooltip("Spawner that will render a UI dot at the predicted impact point on screen.")]
-    public ScreenDotSpawner screenDotSpawner;
-    [Tooltip("Enable a live 2D dot that shows where the current shot will hit (accounts for recoil/weapon pose).")]
-    public bool showLiveAimDot = false;
-
-    [Header("Muzzle FX")]
-    [Tooltip("Prefab for the muzzle flash particle/object that should spawn at the barrel/muzzle when firing.")]
-    public GameObject muzzleFlashPrefab;
-    [Tooltip("Seconds before muzzle flash object auto-destroys (<=0 means keep)")]
-    public float muzzleFlashLifetime = 0.6f;
-    [Tooltip("Offset forward from the muzzle transform along its forward vector to place the flash (meters).")]
-    public float muzzleFlashForwardOffset = 0.04f;
-    [Tooltip("If true, parent the spawned muzzle flash to the muzzle transform (keeps it attached to moving gun).")]
-    public bool parentMuzzleFlashToMuzzle = false;
-
-    void TryHitscan()
+    void SpawnTracer(Ray shotRay, Vector3 tracerEndPoint)
     {
-        Ray ray;
+        if (tracerPrefab == null) return;
+
+        Vector3 start = shotRay.origin;
         if (muzzle != null)
         {
-            ray = new Ray(muzzle.position, muzzle.forward);
+            start = muzzle.position + muzzle.forward * tracerSpawnForwardOffset;
+        }
+
+        BulletTracer tracer = Instantiate(tracerPrefab, start, Quaternion.identity);
+        tracer.Initialize(start, tracerEndPoint, tracerLifetimeOverride, tracerWidthMultiplier);
+    }
+
+    bool TryHitscan(out Ray shotRay, out Vector3 tracerEndPoint)
+    {
+        if (muzzle != null)
+        {
+            shotRay = new Ray(muzzle.position, muzzle.forward);
         }
         else
         {
             Camera cam = shootCamera != null ? shootCamera : Camera.main;
-            if (cam == null) return; // no camera available
+            if (cam == null)
+            {
+                Transform originSource = weaponRoot != null ? weaponRoot : transform;
+                Vector3 dir = originSource.forward.sqrMagnitude > 0f ? originSource.forward : Vector3.forward;
+                shotRay = new Ray(originSource.position, dir);
+                tracerEndPoint = shotRay.origin + shotRay.direction * hitscanRange;
+                return false; // no camera available, so skip hitscan but still build a ray for tracer
+            }
             Vector3 screenCenter = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0f);
-            ray = cam.ScreenPointToRay(screenCenter);
+            shotRay = cam.ScreenPointToRay(screenCenter);
         }
 
-        if (Physics.Raycast(ray, out RaycastHit hit, hitscanRange, hitMask, QueryTriggerInteraction.Ignore)){
+        tracerEndPoint = shotRay.origin + shotRay.direction * hitscanRange;
+
+        if (Physics.Raycast(shotRay, out RaycastHit hit, hitscanRange, hitMask, QueryTriggerInteraction.Ignore)){
+            tracerEndPoint = hit.point;
+
             if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Fleer"))
             {
                 if (ScoreManager.Instance != null)
@@ -315,7 +356,7 @@ public class FpsGunShootAnim : MonoBehaviour
                     if (enemyBall != null)
                     {
                         enemyBall.TriggerExplosion(ignorePlayerEffect: true);
-                        return;
+                        return true;
                     }
                 }
 
@@ -326,18 +367,18 @@ public class FpsGunShootAnim : MonoBehaviour
                     if (fleeBall != null)
                     {
                         fleeBall.TriggerExplosion();
-                        return;
+                        return true;
                     }
                 }
 
                 // Default behavior for non-exploding enemies/fleers
                 Destroy(hit.collider.gameObject);
-                return;
+                return true;
             }
 
             if (hit.rigidbody)
             {
-                hit.rigidbody.AddForceAtPosition(ray.direction * impactImpulse, hit.point, ForceMode.Impulse);
+                hit.rigidbody.AddForceAtPosition(shotRay.direction * impactImpulse, hit.point, ForceMode.Impulse);
             }
 
             var damageable = hit.collider.GetComponentInParent<IDamageable>();
@@ -391,17 +432,22 @@ public class FpsGunShootAnim : MonoBehaviour
                 {
                     Destroy(hole, bulletHoleLifetime);
                 }
-            }
-        }
-    }
 
-    void LateUpdate()
-    {
-        // Apply local weapon recoil after ADS likely set WeaponRoot in its LateUpdate
-        if (weaponLocalRecoil)
-        {
-            weaponLocalRecoil.localPosition = wlrTargetPos;
-            weaponLocalRecoil.localRotation = wlrTargetRot;
+                if (bulletImpactPrefab != null)
+                {
+                    Quaternion impactRot = rot * Quaternion.Euler(0f, 180f, 0f);
+                    GameObject impact = Instantiate(bulletImpactPrefab, pos, impactRot);
+                    impact.transform.Rotate(hit.normal, Random.Range(0f, 360f), Space.World);
+
+                    if (bulletImpactLifetime > 0f)
+                    {
+                        Destroy(impact, bulletImpactLifetime);
+                    }
+                }
+            }
+
+            return true;
         }
+        return false;
     }
 }

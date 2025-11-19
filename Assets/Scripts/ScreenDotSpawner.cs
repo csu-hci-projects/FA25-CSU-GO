@@ -133,4 +133,19 @@ public class ScreenDotSpawner : MonoBehaviour
             singleDot.gameObject.SetActive(false);
         }
     }
+
+    /// <summary>
+    /// Sets the color of the reused dot (if using reuseSingleDot).
+    /// </summary>
+    public void SetDotColor(Color color)
+    {
+        if (reuseSingleDot && singleDot != null)
+        {
+            Image img = singleDot.GetComponent<Image>();
+            if (img != null)
+            {
+                img.color = color;
+            }
+        }
+    }
 }

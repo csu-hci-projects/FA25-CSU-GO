@@ -25,6 +25,16 @@ public class LiveAimDot : MonoBehaviour
     [Tooltip("If true, show the dot even when nothing is hit (placed at maxRange along ray). If false, dot hides when nothing hit.")]
     public bool showAtMaxRange = true;
 
+    [Header("Target Colors")]
+    [Tooltip("Default color of the aim dot.")]
+    public Color defaultColor = Color.white;
+
+    [Tooltip("Color when aiming at a FleeBall.")]
+    public Color fleeBallColor = Color.red;
+
+    [Tooltip("Color when aiming at an EnemyBall.")]
+    public Color enemyBallColor = Color.red;
+
     void Update()
     {
         if (spawner == null) return;
@@ -43,12 +53,31 @@ public class LiveAimDot : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxRange, hitMask, QueryTriggerInteraction.Ignore))
         {
+            // Determine the color based on what we hit
+            Color dotColor = defaultColor;
+            
+            var fleeBall = hit.collider.GetComponentInParent<FleeBall>();
+            if (fleeBall != null)
+            {
+                dotColor = fleeBallColor;
+            }
+            else
+            {
+                var enemyBall = hit.collider.GetComponentInParent<EnemyBall>();
+                if (enemyBall != null)
+                {
+                    dotColor = enemyBallColor;
+                }
+            }
+            
+            spawner.SetDotColor(dotColor);
             spawner.ShowDotAtWorldPosition(hit.point, cam);
         }
         else
         {
             if (showAtMaxRange)
             {
+                spawner.SetDotColor(defaultColor);
                 Vector3 p = ray.origin + ray.direction * maxRange;
                 spawner.ShowDotAtWorldPosition(p, cam);
             }

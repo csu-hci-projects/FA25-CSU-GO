@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 185450818151450516}
   m_Layer: 0
   m_Name: FPCamera
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -834,7 +834,7 @@ GameObject:
   - component: {fileID: 3095174120971164891}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2962,9 +2962,10 @@ GameObject:
   - component: {fileID: 6978653785452661592}
   - component: {fileID: 4451801684320042284}
   - component: {fileID: 4419222057944332917}
+  - component: {fileID: 3908231648173701891}
   m_Layer: 0
   m_Name: PlayerHitboxes
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3127,6 +3128,8 @@ MonoBehaviour:
   constantDecayPerSecond: 1.04
   airTurnRate: 12
   preserveAirSpeed: 1
+  externalImpulseDecay: 6
+  externalHorizontalClamp: 0
 --- !u!114 &4419222057944332917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3139,6 +3142,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47823290bde0e37478464480a16139b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRotate
+--- !u!114 &3908231648173701891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7077414327142768973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a82cb68cbecb9f479e27d98705554f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  currentHealth: 100
+  healthSlider: {fileID: 0}
+  healthLabel: {fileID: 0}
+  gameOverSceneName: 
+  deathDelay: 0.5
 --- !u!1 &7155658872154737126
 GameObject:
   m_ObjectHideFlags: 0
@@ -3311,8 +3331,8 @@ MonoBehaviour:
   useSlide: 1
   slideTravel: 0.13
   slideAxis: {x: 1, y: 0, z: 0}
-  slideBackTime: 0.058
-  slideReturnTime: 0.04
+  slideBackTime: 0.075
+  slideReturnTime: 0.055
   slideCurve:
     serializedVersion: 2
     m_Curve:
@@ -3342,11 +3362,14 @@ MonoBehaviour:
   recoilSnap: 24
   recoilReturn: 32
   maxPitch: 80
-  returnSharpness: 5.4
+  returnSharpness: 8.2
   snapSharpness: 18
   cameraPitch: {fileID: 1973028971032053693}
   cameraKick: 0
   cameraReturn: 0
+  enemyKillPoints: 100
+  fleerKillPoints: 150
+  damageHitPoints: 10
   aimWeight: 0
   aimRecoilMultiplier: 0.6
   weaponLocalRecoil: {fileID: 0}
@@ -3367,12 +3390,18 @@ MonoBehaviour:
   bulletHoleScale: 0.12
   bulletHoleSurfaceOffset: 0.002
   bulletHoleParentToTarget: 0
+  bulletImpactPrefab: {fileID: 100002, guid: 556d09d7fda29fd4185eed4067d5777b, type: 3}
+  bulletImpactLifetime: 1.5
   screenDotSpawner: {fileID: 0}
   showLiveAimDot: 1
   muzzleFlashPrefab: {fileID: 371707642991839552, guid: c24eb860c4529f245bb789cd824b3bad, type: 3}
   muzzleFlashLifetime: 0.12
   muzzleFlashForwardOffset: 0.04
   parentMuzzleFlashToMuzzle: 1
+  tracerPrefab: {fileID: 4184263065293022809, guid: 21be23009aa3c814698778a408c8b7be, type: 3}
+  tracerLifetimeOverride: -1
+  tracerSpawnForwardOffset: 1
+  tracerWidthMultiplier: 0.4
 --- !u!114 &9123228050440538714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3434,6 +3463,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   showAtMaxRange: 1
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  fleeBallColor: {r: 1, g: 0.92156863, b: 0, a: 1}
+  enemyBallColor: {r: 1, g: 0.92156863, b: 0, a: 1}
 --- !u!1 &7660517838916627066
 GameObject:
   m_ObjectHideFlags: 0
