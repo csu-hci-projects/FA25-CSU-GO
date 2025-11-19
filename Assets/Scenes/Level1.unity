@@ -1115,7 +1115,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 645684346}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa439f24fda14dc4b9b3e1e40c061f2b, type: 3}
   m_Name: 
@@ -3235,10 +3235,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2889288160028904590, guid: 9a906356721b8c7419845e6ba6afc03c, type: 3}
-      propertyPath: m_Intensity
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6654893410515566851, guid: 9a906356721b8c7419845e6ba6afc03c, type: 3}
       propertyPath: m_Name
       value: AmmoDrop
@@ -3577,17 +3573,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4639400466219882461, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
-      propertyPath: m_Intensity
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.7
+      value: 1.6999998
       objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3599,15 +3591,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3753,7 +3745,7 @@ SceneRoots:
   - {fileID: 2020683372}
   - {fileID: 2921142035795193890}
   - {fileID: 2183271011766387504}
-  - {fileID: 424206066}
-  - {fileID: 1282388662}
   - {fileID: 7168230312244300664}
   - {fileID: 836202724680473210}
+  - {fileID: 424206066}
+  - {fileID: 1282388662}
