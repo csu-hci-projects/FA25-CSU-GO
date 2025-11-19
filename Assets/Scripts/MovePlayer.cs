@@ -74,6 +74,19 @@ public class PlayerMovementFPSBhop : MonoBehaviour
     private bool punishedThisLanding;
     private float bhopBonus; // current stacked bonus speed
 
+    [Header("External Forces")]
+    [Tooltip("Decay rate for externally applied impulses (per second, higher = fade faster).")]
+    public float externalImpulseDecay = 6f;
+    [Tooltip("Clamp for horizontal magnitude contributed by external impulses (optional, 0 = no clamp).")]
+    public float externalHorizontalClamp = 0f;
+    private Vector3 externalImpulse; // added to velocity each FixedUpdate, decays over time
+
+    // Allow other scripts (e.g., explosions) to add impulses that the movement system will respect
+    public void ApplyExternalImpulse(Vector3 impulse)
+    {
+        externalImpulse += impulse;
+    }
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -156,16 +169,34 @@ public class PlayerMovementFPSBhop : MonoBehaviour
             punishedThisLanding = false;
         }
 
+        // --- Apply external impulse FIRST ---
+        Vector3 ext = externalImpulse;
+        if (externalHorizontalClamp > 0f)
+        {
+            Vector3 extHoriz = new Vector3(ext.x, 0f, ext.z);
+            float mag = extHoriz.magnitude;
+            if (mag > externalHorizontalClamp)
+            {
+                Vector3 clamped = extHoriz.normalized * externalHorizontalClamp;
+                ext.x = clamped.x; ext.z = clamped.z;
+            }
+        }
+
         // --- Movement ---
         float effectiveSpeed = moveSpeed + bhopBonus;
         Vector3 v = rb.linearVelocity;
+        v += ext; // add external impulse to current velocity before movement logic
         Vector3 horiz = new Vector3(v.x, 0f, v.z);
 
         // camera-relative desired move dir from LateUpdate
         Vector3 wishDir = desiredMoveDir; // already normalized (or zero)
 
+        // Check if external forces are significant enough to override grounded snapping
+        float extHorizMag = new Vector3(ext.x, 0f, ext.z).magnitude;
+        bool hasSignificantExternalForce = extHorizMag > 0.5f;
+
         // GROUNDED: snap to desired dir * speed (instant accel is OK on ground)
-        if (isGrounded)
+        if (isGrounded && !hasSignificantExternalForce)
         {
             Vector3 targetXZ = wishDir * effectiveSpeed;
 
@@ -235,6 +266,13 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         }
 
         rb.linearVelocity = v;
+
+        // Exponential decay toward zero so the player quickly regains full control
+        if (externalImpulseDecay > 0f)
+        {
+            float k = 1f - Mathf.Exp(-externalImpulseDecay * Time.fixedDeltaTime);
+            externalImpulse = Vector3.Lerp(externalImpulse, Vector3.zero, k);
+        }
 
 
         // --- Jump (fixed, consistent height) ---

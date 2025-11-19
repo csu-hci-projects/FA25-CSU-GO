@@ -189,11 +189,17 @@ MonoBehaviour:
   stopRange: 1.5
   moveForce: 50
   maxSpeed: 12
-  damageAmount: 10
-  damageInterval: 1
+  explosionPrefab: {fileID: 100006, guid: 28ccd38a41e256a4e8fea96f5a8d039d, type: 3}
+  explosionFxLifetime: 4
+  explosionScale: 1
+  explosionForce: 2
+  explosionUpBoost: 0.05
+  explosionRadius: 2.1
+  explosionDamage: 10
+  knockbackMaxHorizontalSpeed: 8
+  knockbackMaxUpSpeed: 2
   pathUpdateInterval: 0.4
   waypointReachDistance: 1.5
-  navMeshStickDistance: 2
   jumpForce: 15
   jumpCooldown: 2
   stuckTimeThreshold: 3
@@ -214,9 +220,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallDustEffect
   dustPrefab: {fileID: 100000, guid: 902406362f09aa2488ee3d65e2fd6aa3, type: 3}
-  prefabScale: 0.4
+  prefabScale: 0.3
   minSpeedForDust: 0.5
-  spawnInterval: 0.1
+  spawnInterval: 0.07
   spawnDelay: 0.2
   spawnOffset: {x: 0, y: 0, z: 0}
   alignToGround: 1

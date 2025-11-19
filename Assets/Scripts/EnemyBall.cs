@@ -8,39 +8,52 @@ public class EnemyBall : MonoBehaviour
     [SerializeField] float stopRange = 1.5f;
     [SerializeField] float moveForce = 25f;
     [SerializeField] float maxSpeed = 8f;
+    [Tooltip("Height offset for line-of-sight raycasts.")]
+    [SerializeField] float sightHeight = 0.75f;
+    [Tooltip("Layers that block line-of-sight between enemy and player.")]
+    [SerializeField] LayerMask losObstructionMask = ~0;
 
-    [Header("Damage")]
-    [SerializeField] int damageAmount = 10;
-    [SerializeField] float damageInterval = 1f;
+    [Header("Explosion")]
+    [SerializeField] GameObject explosionPrefab;
+    [Tooltip("Seconds before spawned explosion FX is auto-destroyed (<=0 keeps it).")]
+    [SerializeField] float explosionFxLifetime = 3f;
+    [Tooltip("Scale multiplier for the explosion effect (1 = original size).")]
+    [SerializeField] float explosionScale = 1f;
+    [Header("Explosion Knockback")]
+    [Tooltip("Max horizontal impulse at the center of the explosion.")]
+    [SerializeField] float explosionForce = 18f;
+    [Tooltip("Extra upward boost added to the impulse.")]
+    [SerializeField] float explosionUpBoost = 3f;
+    [Tooltip("Radius over which the impulse scales down to zero.")]
+    [SerializeField] float explosionRadius = 3.5f;
+    [Tooltip("Optional damage to apply to player once on explosion (0 = none).")]
+    [SerializeField] int explosionDamage = 0;
+
+    [Header("Knockback Limits")] 
+    [Tooltip("Hard cap for player's horizontal speed right after knockback (m/s).")]
+    [SerializeField] float knockbackMaxHorizontalSpeed = 8f;
+    [Tooltip("Hard cap for player's upward speed right after knockback (m/s).")]
+    [SerializeField] float knockbackMaxUpSpeed = 6f;
 
     [Header("NavMesh")]
-    [SerializeField] float pathUpdateInterval = 0.4f;
-    [SerializeField] float waypointReachDistance = 1.5f;
-    [SerializeField] float navMeshStickDistance = 2f; // max distance from NavMesh before forcing back
+    [SerializeField] float pathUpdateInterval = 0.9f;
+    [SerializeField] float waypointReachDistance = 0.75f;
+    [Tooltip("Height offset above NavMesh surface to prevent clipping into ground.")]
+    [SerializeField] float navMeshHeightOffset = 0.5f;
 
-    [Header("Jump")]
-    [SerializeField] float jumpForce = 10f;
-    [SerializeField] float jumpCooldown = 2f;
-    [SerializeField] float stuckTimeThreshold = 3f; // time before considering stuck
-    [SerializeField] float stuckDistanceThreshold = 2f; // distance moved to not be stuck
-    [SerializeField] float minJumpInterval = 2f; // minimum time before jumping at player
-    [SerializeField] float maxJumpInterval = 5f; // maximum time before jumping at player
-    [SerializeField] float lungeJumpForce = 15f; // force for jumping directly at player
+    [Header("Jump Attack")]
+    [SerializeField] float jumpInterval = 1.2f;
+    [SerializeField] float jumpForce = 8f;
+    float nextJumpTime = 0f;
 
     Rigidbody rb;
     Transform player;
-    float lastDamageTime;
     bool hasAggro = false;
+    bool exploded = false;
 
     NavMeshPath navPath;
     int currentCorner = 0;
     float nextPathUpdate = 0f;
-
-    // Jump/stuck detection
-    float lastJumpTime = -999f;
-    Vector3 lastPositionCheck;
-    float stuckTimer = 0f;
-    float nextLungeTime = 0f;
 
     void Awake()
     {
@@ -62,15 +75,6 @@ public class EnemyBall : MonoBehaviour
         {
             player = playerObj.transform;
         }
-        
-        lastPositionCheck = transform.position;
-        ScheduleNextLunge();
-    }
-
-    void ScheduleNextLunge()
-    {
-        float randomDelay = Random.Range(minJumpInterval, maxJumpInterval);
-        nextLungeTime = Time.time + randomDelay;
     }
 
     void FixedUpdate()
@@ -87,38 +91,77 @@ public class EnemyBall : MonoBehaviour
 
         if (!hasAggro) return;
 
-        // Check if it's time for a lunge jump at the player
-        if (Time.time >= nextLungeTime)
-        {
-            LungeAtPlayer();
-            ScheduleNextLunge();
-        }
-
-        // Check if stuck (not making progress toward player)
-        CheckIfStuck();
-
-        // Try to jump if stuck and cooldown passed
-        if (stuckTimer >= stuckTimeThreshold && Time.time >= lastJumpTime + jumpCooldown)
-        {
-            JumpTowardPlayer();
-        }
+        bool inSight = HasLineOfSight();
 
         // Update NavMesh path periodically
-        if (Time.time >= nextPathUpdate)
+        if (!inSight && Time.time >= nextPathUpdate)
         {
             UpdatePath();
             nextPathUpdate = Time.time + pathUpdateInterval;
+        }
+        else if (inSight)
+        {
+            // Clear path when chasing via physics to avoid stale corners
+            navPath.ClearCorners();
+            currentCorner = 0;
         }
 
         // Stop pushing when very close to player
         if (distanceToPlayer <= stopRange) return;
 
-        // Get direction to next waypoint or player
-        Vector3 targetDirection = GetTargetDirection();
-        if (targetDirection == Vector3.zero) return;
+        // Periodic jump toward player
+        if (Time.time >= nextJumpTime)
+        {
+            Vector3 toPlayer = player.position - rb.position;
+            if (toPlayer.sqrMagnitude > 0.5f)
+            {
+                // Add slight randomization to jump direction
+                Vector3 randomOffset = new Vector3(Random.Range(-0.15f, 0.15f), Random.Range(-0.05f, 0.05f), Random.Range(-0.15f, 0.15f));
+                Vector3 jumpDir = (toPlayer + randomOffset).normalized;
+                rb.AddForce(jumpDir * jumpForce, ForceMode.Impulse);
+            }
+            nextJumpTime = Time.time + jumpInterval;
+        }
 
-        // Apply force toward target
-        rb.AddForce(targetDirection * moveForce, ForceMode.Acceleration);
+        if (inSight)
+        {
+            PhysicsChase();
+        }
+        else
+        {
+            NavMeshMove();
+        }
+    }
+
+    bool HasLineOfSight()
+    {
+        if (player == null) return false;
+        Vector3 origin = rb.position + Vector3.up * sightHeight;
+        Vector3 target = player.position + Vector3.up * sightHeight;
+        Vector3 dir = target - origin;
+        float dist = dir.magnitude;
+        if (dist <= 0.001f) return true;
+        dir /= dist;
+
+        // Raycast: if we hit something before the player, line of sight is blocked
+        if (Physics.Raycast(origin, dir, out RaycastHit hit, dist, losObstructionMask, QueryTriggerInteraction.Ignore))
+        {
+            // If we hit the player, we have line of sight
+            return hit.collider.CompareTag("Player");
+        }
+        // Nothing was hit: unobstructed
+        return true;
+    }
+
+    void PhysicsChase()
+    {
+        // Direct force toward player using physics
+        Vector3 toPlayer = player.position - rb.position;
+        toPlayer.y = 0f;
+        if (toPlayer.sqrMagnitude < 0.0001f) return;
+
+        Vector3 dir = toPlayer.normalized;
+        rb.AddForce(dir * moveForce, ForceMode.Acceleration);
 
         // Clamp horizontal speed
         Vector3 vel = rb.linearVelocity;
@@ -130,61 +173,41 @@ public class EnemyBall : MonoBehaviour
         }
     }
 
-    void CheckIfStuck()
+    void NavMeshMove()
     {
-        float distanceMoved = Vector3.Distance(rb.position, lastPositionCheck);
-        
-        if (distanceMoved < stuckDistanceThreshold)
+        // Move strictly along NavMesh path - no direct movement allowed
+        Vector3 targetDirection = GetNavMeshDirection();
+        if (targetDirection == Vector3.zero)
         {
-            stuckTimer += Time.fixedDeltaTime;
+            // No valid path, stop moving
+            Vector3 v = rb.linearVelocity;
+            rb.linearVelocity = new Vector3(0f, v.y, 0f);
+            return;
+        }
+
+        float speed = Mathf.Max(0.01f, maxSpeed);
+        Vector3 desiredStep = targetDirection * speed * Time.fixedDeltaTime;
+        Vector3 candidate = rb.position + desiredStep;
+
+        // Sample NavMesh to stay on surface and prevent clipping through floor
+        if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+        {
+            // Keep the NavMesh Y position plus offset to stay above surface
+            candidate = new Vector3(candidate.x, hit.position.y + navMeshHeightOffset, candidate.z);
+            rb.MovePosition(candidate);
         }
         else
         {
-            stuckTimer = 0f;
-            lastPositionCheck = rb.position;
+            // If candidate is off NavMesh, try to get back onto it from current position
+            if (NavMesh.SamplePosition(rb.position, out NavMeshHit currentHit, 5f, NavMesh.AllAreas))
+            {
+                Vector3 backOnMesh = new Vector3(rb.position.x, currentHit.position.y + navMeshHeightOffset, rb.position.z);
+                rb.MovePosition(backOnMesh);
+            }
         }
-    }
 
-    void JumpTowardPlayer()
-    {
-        if (player == null) return;
-
-        // Direction toward player
-        Vector3 toPlayer = (player.position - rb.position).normalized;
-        
-        // Jump force: forward toward player + upward
-        Vector3 jumpDirection = toPlayer;
-        jumpDirection.y = 1f; // Add upward component
-        jumpDirection.Normalize();
-
-        rb.AddForce(jumpDirection * jumpForce, ForceMode.Impulse);
-        
-        lastJumpTime = Time.time;
-        stuckTimer = 0f;
-        lastPositionCheck = rb.position;
-    }
-
-    void LungeAtPlayer()
-    {
-        if (player == null) return;
-
-        // Calculate direct path to player's current position
-        Vector3 toPlayer = player.position - rb.position;
-        float horizontalDistance = new Vector3(toPlayer.x, 0f, toPlayer.z).magnitude;
-        
-        // Calculate trajectory to reach player
-        // Add strong upward and forward force to create an arc
-        Vector3 direction = toPlayer.normalized;
-        direction.y = Mathf.Clamp(0.5f + (horizontalDistance * 0.05f), 0.5f, 1.5f); // Scale height with distance
-        direction.Normalize();
-
-        // Apply lunge force
-        rb.linearVelocity = Vector3.zero; // Reset velocity for clean jump
-        rb.AddForce(direction * lungeJumpForce, ForceMode.Impulse);
-        
-        lastJumpTime = Time.time;
-        stuckTimer = 0f;
-        lastPositionCheck = rb.position;
+        // Zero horizontal velocity so physics doesn't drift us off-path
+        // (Do not touch vertical velocity so jumping works)
     }
 
     void UpdatePath()
@@ -194,27 +217,53 @@ public class EnemyBall : MonoBehaviour
         // Calculate path from current position to player
         if (navPath == null) navPath = new NavMeshPath();
         
-        if (NavMesh.CalculatePath(rb.position, player.position, NavMesh.AllAreas, navPath))
+        // Ensure we're starting from a valid NavMesh position
+        Vector3 startPos = rb.position;
+        if (!NavMesh.SamplePosition(rb.position, out NavMeshHit startHit, 5f, NavMesh.AllAreas))
         {
-            if (navPath.status == NavMeshPathStatus.PathComplete && navPath.corners.Length > 1)
+            // Enemy is too far from NavMesh, can't calculate path
+            navPath.ClearCorners();
+            currentCorner = 0;
+            return;
+        }
+        startPos = startHit.position;
+        
+        // Ensure destination is valid
+        Vector3 endPos = player.position;
+        if (!NavMesh.SamplePosition(player.position, out NavMeshHit endHit, 5f, NavMesh.AllAreas))
+        {
+            // Player is off NavMesh, can't calculate path
+            navPath.ClearCorners();
+            currentCorner = 0;
+            return;
+        }
+        endPos = endHit.position;
+        
+        if (NavMesh.CalculatePath(startPos, endPos, NavMesh.AllAreas, navPath))
+        {
+            if (navPath.status == NavMeshPathStatus.PathComplete || navPath.status == NavMeshPathStatus.PathPartial)
             {
-                currentCorner = 1; // Start at index 1 (skip current position)
-                return;
+                if (navPath.corners.Length > 1)
+                {
+                    currentCorner = 1; // Start at index 1 (skip current position)
+                    return;
+                }
             }
         }
 
         // No valid path - clear it
         navPath.ClearCorners();
+        currentCorner = 0;
     }
 
-    Vector3 GetTargetDirection()
+    Vector3 GetNavMeshDirection()
     {
+        // ONLY follow NavMesh path corners, never direct to player
         if (navPath == null || navPath.corners == null || navPath.corners.Length <= 1)
         {
-            // No path - go direct to player
-            Vector3 dir = player.position - rb.position;
-            dir.y = 0f;
-            return dir.sqrMagnitude > 0.01f ? dir.normalized : Vector3.zero;
+            // No valid path - request update and don't move
+            nextPathUpdate = 0f; // Force immediate path update
+            return Vector3.zero;
         }
 
         // Advance to next corner when close
@@ -234,36 +283,154 @@ public class EnemyBall : MonoBehaviour
             }
         }
 
-        // All corners reached, go direct to player
-        Vector3 toPlayer = player.position - rb.position;
-        toPlayer.y = 0f;
-        return toPlayer.sqrMagnitude > 0.01f ? toPlayer.normalized : Vector3.zero;
+        // All corners reached - force immediate path update
+        nextPathUpdate = 0f;
+        return Vector3.zero;
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        if (exploded) return;
         if (collision.collider.CompareTag("Player"))
         {
-            TryDamage(collision.collider.gameObject);
+            Rigidbody playerRb = collision.collider.attachedRigidbody;
+            TriggerExplosionAffectPlayer(playerRb);
         }
     }
 
-    void OnCollisionStay(Collision collision)
+    public void TriggerExplosion(bool ignorePlayerEffect)
     {
-        if (collision.collider.CompareTag("Player"))
+        if (exploded) return;
+        exploded = true;
+
+        // Spawn FX
+        if (explosionPrefab != null)
         {
-            TryDamage(collision.collider.gameObject);
+            var fx = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            if (explosionScale > 0f)
+                fx.transform.localScale = Vector3.one * explosionScale;
+            if (explosionFxLifetime > 0f)
+                Destroy(fx, explosionFxLifetime);
         }
+
+        // If ignoring player effect (e.g., shot by player), skip knockback/damage
+        if (!ignorePlayerEffect)
+        {
+            // If we have a cached player, apply an area check just in case
+            if (player != null)
+            {
+                Rigidbody prb = player.GetComponent<Rigidbody>();
+                if (prb != null)
+                {
+                    ApplyKnockback(prb);
+                    ApplyExplosionDamage(player.gameObject);
+                }
+            }
+        }
+
+        Destroy(gameObject);
     }
 
-    void TryDamage(GameObject playerObj)
+    public void TriggerExplosionAffectPlayer(Rigidbody playerRb)
     {
-        if (Time.time < lastDamageTime + damageInterval) return;
-        PlayerHealth playerHealth = playerObj.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
+        if (exploded) return;
+        exploded = true;
+
+        if (explosionPrefab != null)
         {
-            playerHealth.TakeDamage(damageAmount);
-            lastDamageTime = Time.time;
+            var fx = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            if (explosionScale > 0f)
+                fx.transform.localScale = Vector3.one * explosionScale;
+            if (explosionFxLifetime > 0f)
+                Destroy(fx, explosionFxLifetime);
+        }
+
+        if (playerRb != null)
+        {
+            ApplyKnockback(playerRb);
+            ApplyExplosionDamage(playerRb.gameObject);
+        }
+
+        Destroy(gameObject);
+    }
+
+    void ApplyKnockback(Rigidbody playerRb)
+    {
+        // Radial falloff 0..1 based on distance
+        Vector3 toPlayer = playerRb.position - transform.position;
+        float dist = toPlayer.magnitude;
+        float t = explosionRadius > 0.0001f ? Mathf.Clamp01(1f - (dist / explosionRadius)) : 1f;
+
+        // Horizontal knockback direction
+        Vector3 horiz = new Vector3(toPlayer.x, 0f, toPlayer.z);
+        if (horiz.sqrMagnitude < 1e-6f) horiz = Vector3.forward; // fallback to any direction
+        Vector3 horizDir = horiz.normalized;
+
+        // Build a single impulse (momentum) vector
+        float horizImpulseMag = explosionForce * t;
+        float upImpulseMag = Mathf.Max(0f, explosionUpBoost * t);
+        Vector3 impulse = horizDir * horizImpulseMag + Vector3.up * upImpulseMag;
+
+        // Prefer handing off to the movement script so ground logic still adds this shove
+        var mover = playerRb.GetComponent<PlayerMovementFPSBhop>();
+        if (mover != null)
+        {
+            // Convert physics impulse (N·s) to delta-velocity by dividing by mass
+            float mass = Mathf.Max(0.0001f, playerRb.mass);
+            Vector3 deltaV = impulse / mass;
+
+            // Clamp the added deltaV so we don't exceed caps after this frame
+            Vector3 vCur = playerRb.linearVelocity;
+            Vector3 vCurH = new Vector3(vCur.x, 0f, vCur.z);
+
+            float maxH = Mathf.Max(0f, knockbackMaxHorizontalSpeed);
+            if (maxH > 0f)
+            {
+                Vector3 addH = new Vector3(deltaV.x, 0f, deltaV.z);
+                float allowedAdd = Mathf.Max(0f, maxH - vCurH.magnitude);
+                if (addH.magnitude > allowedAdd)
+                {
+                    Vector3 clamped = addH.normalized * allowedAdd;
+                    deltaV.x = clamped.x; deltaV.z = clamped.z;
+                }
+            }
+
+            float maxUp = Mathf.Max(0f, knockbackMaxUpSpeed);
+            if (maxUp > 0f && deltaV.y > 0f)
+            {
+                float allowedUp = Mathf.Max(0f, maxUp - Mathf.Max(0f, vCur.y));
+                if (deltaV.y > allowedUp)
+                    deltaV.y = allowedUp;
+            }
+
+            mover.ApplyExternalImpulse(deltaV);
+            return;
+        }
+
+        // Fallback: apply directly to the rigidbody and clamp velocity
+        playerRb.AddForce(impulse, ForceMode.Impulse);
+
+        Vector3 v = playerRb.linearVelocity;
+        Vector3 vHoriz = new Vector3(v.x, 0f, v.z);
+        float maxH2 = Mathf.Max(0f, knockbackMaxHorizontalSpeed);
+        if (vHoriz.magnitude > maxH2 && maxH2 > 0f)
+        {
+            Vector3 clampedH = vHoriz.normalized * maxH2;
+            v.x = clampedH.x; v.z = clampedH.z;
+        }
+
+        float maxUp2 = Mathf.Max(0f, knockbackMaxUpSpeed);
+        if (v.y > maxUp2 && maxUp2 > 0f) v.y = maxUp2;
+        playerRb.linearVelocity = v;
+    }
+
+    void ApplyExplosionDamage(GameObject playerObj)
+    {
+        if (explosionDamage <= 0) return;
+        var ph = playerObj.GetComponent<PlayerHealth>();
+        if (ph != null)
+        {
+            ph.TakeDamage(explosionDamage);
         }
     }
 

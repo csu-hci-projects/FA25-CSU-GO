@@ -193,8 +193,10 @@ MonoBehaviour:
   searchSamples: 50
   pathUpdateInterval: 0.3
   waypointReachDistance: 1.5
-  scoreValue: 100
-  destroyOnCatch: 1
+  explosionPrefab: {fileID: 100006, guid: a49596ebf788acd4ab1281bffea444b1, type: 3}
+  explosionFxLifetime: 3
+  explosionScale: 1
+  deactivatedMaterial: {fileID: 2100000, guid: b242c006026397d4d845f834bc054911, type: 2}
 --- !u!114 &3170576475408001938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,9 +210,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallDustEffect
   dustPrefab: {fileID: 100000, guid: 902406362f09aa2488ee3d65e2fd6aa3, type: 3}
-  prefabScale: 0.4
+  prefabScale: 0.3
   minSpeedForDust: 0.5
-  spawnInterval: 0.1
+  spawnInterval: 0.07
   spawnDelay: 0.2
   spawnOffset: {x: 0, y: 0, z: 0}
   alignToGround: 1

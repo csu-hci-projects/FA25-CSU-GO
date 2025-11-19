@@ -10,18 +10,30 @@ public class FleeBall : MonoBehaviour
     [SerializeField] float moveForce = 30f;
     [SerializeField] float maxSpeed = 10f;
     [SerializeField] int searchSamples = 50; // number of random points to sample for farthest node
+    [SerializeField] float loseInterestTime = 2f; // seconds without line of sight before stopping
 
     [Header("NavMesh")]
     [SerializeField] float pathUpdateInterval = 0.3f;
     [SerializeField] float waypointReachDistance = 1.5f;
 
-    [Header("Victory")]
-    [SerializeField] int scoreValue = 100; // points awarded when caught
-    [SerializeField] bool destroyOnCatch = true;
+    [Header("Explosion")]
+    [SerializeField] GameObject explosionPrefab;
+    [Tooltip("Seconds before spawned explosion FX is auto-destroyed (<=0 keeps it).")]
+    [SerializeField] float explosionFxLifetime = 3f;
+    [Tooltip("Scale multiplier for the explosion effect (1 = original size).")]
+    [SerializeField] float explosionScale = 1f;
+
+    [Header("Deactivation (on catch)")]
+    [Tooltip("Material to apply when ball is caught/deactivated. Leave null to keep original.")]
+    [SerializeField] Material deactivatedMaterial;
 
     Rigidbody rb;
     Transform player;
     bool isFleeing = false;
+    bool isDeactivated = false;
+    bool exploded = false;
+    bool hasLineOfSight = false;
+    float lastSeenTime = 0f;
 
     NavMeshPath navPath;
     int currentCorner = 0;
@@ -51,14 +63,31 @@ public class FleeBall : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (player == null || rb == null) return;
+        if (player == null || rb == null || isDeactivated) return;
 
         float distanceToPlayer = Vector3.Distance(rb.position, player.position);
+
+        // Check line of sight to player
+        hasLineOfSight = CheckLineOfSight();
 
         // Start fleeing when player gets close
         if (!isFleeing && distanceToPlayer <= detectionRange)
         {
             isFleeing = true;
+            lastSeenTime = Time.time;
+        }
+
+        // Stop fleeing if player hasn't been seen for too long
+        if (isFleeing && !hasLineOfSight)
+        {
+            if (Time.time - lastSeenTime > loseInterestTime)
+            {
+                isFleeing = false;
+            }
+        }
+        else if (isFleeing && hasLineOfSight)
+        {
+            lastSeenTime = Time.time;
         }
 
         if (!isFleeing) return;
@@ -200,7 +229,82 @@ public class FleeBall : MonoBehaviour
         return awayFinal.sqrMagnitude > 0.01f ? awayFinal.normalized : Vector3.zero;
     }
 
-    // Ball no longer disappears on contact - just keeps fleeing
+    bool CheckLineOfSight()
+    {
+        if (player == null) return false;
+
+        Vector3 directionToPlayer = player.position - rb.position;
+        float distanceToPlayer = directionToPlayer.magnitude;
+
+        // Raycast to check for obstacles between ball and player
+        RaycastHit hit;
+        if (Physics.Raycast(rb.position, directionToPlayer.normalized, out hit, distanceToPlayer))
+        {
+            // If the raycast hit the player, we have line of sight
+            if (hit.collider.CompareTag("Player"))
+            {
+                return true;
+            }
+            // Otherwise something is blocking the view
+            return false;
+        }
+
+        // No obstacles detected, have line of sight
+        return true;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (isDeactivated || exploded) return;
+        
+        // Player catches the ball
+        if (collision.collider.CompareTag("Player"))
+        {
+            DeactivateAI();
+        }
+    }
+
+    public void DeactivateAI()
+    {
+        if (isDeactivated) return;
+        isDeactivated = true;
+
+        // Stop current movement but keep physics active
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            // Keep rb.isKinematic = false so physics still affects it
+        }
+
+        // Change material if provided
+        if (deactivatedMaterial != null)
+        {
+            var renderer = GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material = deactivatedMaterial;
+            }
+        }
+    }
+
+    public void TriggerExplosion()
+    {
+        if (exploded) return;
+        exploded = true;
+
+        // Spawn FX
+        if (explosionPrefab != null)
+        {
+            var fx = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            if (explosionScale > 0f)
+                fx.transform.localScale = Vector3.one * explosionScale;
+            if (explosionFxLifetime > 0f)
+                Destroy(fx, explosionFxLifetime);
+        }
+
+        Destroy(gameObject);
+    }
 
     void OnDrawGizmosSelected()
     {

@@ -43,7 +43,7 @@ public class FpsGunShootAnim : MonoBehaviour
     public int enemyKillPoints = 100;
 
     [Tooltip("Points awarded when killing a Fleer-tagged object.")]
-    public int fleerKillPoints = 50;
+    public int fleerKillPoints = 150;
 
     [Tooltip("Points awarded when hitting a generic damageable (if you want per-hit score).")]
     public int damageHitPoints = 10;
@@ -308,6 +308,29 @@ public class FpsGunShootAnim : MonoBehaviour
                     ScoreManager.Instance.AddPoints(points);
                 }
 
+                // If this was an enemy ball, trigger its explosion (no player effect when shot)
+                if (hit.collider.CompareTag("Enemy"))
+                {
+                    var enemyBall = hit.collider.GetComponentInParent<EnemyBall>();
+                    if (enemyBall != null)
+                    {
+                        enemyBall.TriggerExplosion(ignorePlayerEffect: true);
+                        return;
+                    }
+                }
+
+                // If this was a fleer ball, trigger its explosion
+                if (hit.collider.CompareTag("Fleer"))
+                {
+                    var fleeBall = hit.collider.GetComponentInParent<FleeBall>();
+                    if (fleeBall != null)
+                    {
+                        fleeBall.TriggerExplosion();
+                        return;
+                    }
+                }
+
+                // Default behavior for non-exploding enemies/fleers
                 Destroy(hit.collider.gameObject);
                 return;
             }
