@@ -1134,8 +1134,8 @@ MonoBehaviour:
   enemyBallPrefab: {fileID: 2821268239385096503, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
   fleeBallPrefab: {fileID: 4869017589782460716, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
   enemyBallCount: 1
-  fleeBallCount: 0
-  minDistanceFromPlayer: 5
+  fleeBallCount: 1
+  minDistanceFromPlayer: 15
   maxDistanceFromPlayer: 30
   pathSampleCount: 10
   groundMask:
@@ -2725,9 +2725,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 3633885107956443826}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -973.7, y: -221}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 100, y: -50}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1827906083
@@ -3268,6 +3268,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1295368310099734065, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2225177461522701363, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.1
