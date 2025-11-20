@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using UnityEngine.AI;
 
 public class FleeBall : MonoBehaviour
@@ -26,6 +27,14 @@ public class FleeBall : MonoBehaviour
     [Header("Deactivation (on catch)")]
     [Tooltip("Material to apply when ball is caught/deactivated. Leave null to keep original.")]
     [SerializeField] Material deactivatedMaterial;
+
+    [Header("Health Drop")]
+    [Tooltip("Health pickup prefab to spawn when ball explodes.")]
+    [SerializeField] GameObject healthDropPrefab;
+    [Tooltip("Offset for spawning the health drop relative to ball position.")]
+    [SerializeField] Vector3 healthDropSpawnOffset = new Vector3(0f, 0.5f, 0f);
+    [Tooltip("Delay in seconds before spawning the health drop.")]
+    [SerializeField] float healthDropSpawnDelay = 0f;
 
     Rigidbody rb;
     Transform player;
@@ -303,6 +312,23 @@ public class FleeBall : MonoBehaviour
                 Destroy(fx, explosionFxLifetime);
         }
 
+        // Spawn health drop (immediately or after delay)
+        if (healthDropPrefab != null)
+        {
+            Vector3 dropPosition = transform.position + healthDropSpawnOffset;
+            if (healthDropSpawnDelay <= 0f)
+            {
+                Instantiate(healthDropPrefab, dropPosition, Quaternion.identity);
+            }
+            else
+            {
+                // Use a short-lived helper GameObject to spawn after a delay so the ball can be destroyed immediately
+                GameObject spawner = new GameObject("HealthDropSpawner");
+                var hs = spawner.AddComponent<HealthDropSpawner>();
+                hs.Setup(healthDropPrefab, dropPosition, Quaternion.identity, healthDropSpawnDelay);
+            }
+        }
+
         Destroy(gameObject);
     }
 
@@ -320,5 +346,37 @@ public class FleeBall : MonoBehaviour
                 Gizmos.DrawLine(navPath.corners[i], navPath.corners[i + 1]);
             }
         }
+    }
+}
+
+/// <summary>
+/// Helper MonoBehaviour that spawns a prefab after a delay and then destroys itself.
+/// Created at runtime by `FleeBall` so the spawn can occur after the originating object is destroyed.
+/// </summary>
+public class HealthDropSpawner : MonoBehaviour
+{
+    GameObject prefab;
+    Vector3 position;
+    Quaternion rotation;
+    float delay;
+
+    public void Setup(GameObject prefab, Vector3 position, Quaternion rotation, float delay)
+    {
+        this.prefab = prefab;
+        this.position = position;
+        this.rotation = rotation;
+        this.delay = Mathf.Max(0f, delay);
+        DontDestroyOnLoad(gameObject);
+        StartCoroutine(SpawnCoroutine());
+    }
+
+    IEnumerator SpawnCoroutine()
+    {
+        yield return new WaitForSeconds(delay);
+        if (prefab != null)
+        {
+            Instantiate(prefab, position, rotation);
+        }
+        Destroy(gameObject);
     }
 }

@@ -198,6 +198,9 @@ MonoBehaviour:
   explosionFxLifetime: 3
   explosionScale: 1
   deactivatedMaterial: {fileID: 2100000, guid: b242c006026397d4d845f834bc054911, type: 2}
+  healthDropPrefab: {fileID: 6781029310454996017, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
+  healthDropSpawnOffset: {x: 0, y: 0.7, z: 0}
+  healthDropSpawnDelay: 0.2
 --- !u!114 &3170576475408001938
 MonoBehaviour:
   m_ObjectHideFlags: 0

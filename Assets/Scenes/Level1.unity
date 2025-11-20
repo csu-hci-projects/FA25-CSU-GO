@@ -1115,7 +1115,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 645684346}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa439f24fda14dc4b9b3e1e40c061f2b, type: 3}
   m_Name: 
@@ -3576,6 +3576,10 @@ PrefabInstance:
     - target: {fileID: 2613550835100718650, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: healAmount
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4622508748147972076, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
+      propertyPath: m_RayTracingMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5456640544535460398, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
       propertyPath: m_LocalPosition.x
