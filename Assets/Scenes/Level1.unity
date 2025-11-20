@@ -3292,6 +3292,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1295368310099734065, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
+      propertyPath: explosionScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1295368310099734065, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
+      propertyPath: explosionPrefab
+      value: 
+      objectReference: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
     - target: {fileID: 2225177461522701363, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.1
@@ -3349,6 +3357,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
+      propertyPath: maxSpeed
+      value: 16.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
+      propertyPath: explosionScale
+      value: 1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 454724163837572689, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
+      propertyPath: explosionPrefab
+      value: 
+      objectReference: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
     - target: {fileID: 2821268239385096503, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
       propertyPath: m_Name
       value: EnemyBall

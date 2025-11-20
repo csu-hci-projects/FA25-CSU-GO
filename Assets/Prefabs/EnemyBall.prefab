@@ -188,14 +188,14 @@ MonoBehaviour:
   detectionRange: 256
   stopRange: 1.5
   moveForce: 35
-  maxSpeed: 15
+  maxSpeed: 16.7
   sightHeight: 0.75
   losObstructionMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  explosionPrefab: {fileID: 100006, guid: a49596ebf788acd4ab1281bffea444b1, type: 3}
-  explosionFxLifetime: 4
-  explosionScale: 1.4
+  explosionPrefab: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
+  explosionFxLifetime: 5
+  explosionScale: 1.6
   explosionForce: 2
   explosionUpBoost: 2
   explosionRadius: 2.1
@@ -219,17 +219,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 117d070b83588c04aa630e48839076ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallDustEffect
-  dustPrefab: {fileID: 100000, guid: 5a4630d3d41eb154fb963600cf40e826, type: 3}
-  prefabScale: 0.3
-  minSpeedForDust: 8
-  spawnInterval: 0.07
-  spawnDelay: 0.2
-  spawnOffset: {x: 0, y: 0, z: 0}
+  minSpeedForTrail: 10
+  trailMaterial: {fileID: 2100000, guid: e596d3e32e3bce5498584e8ce3be27c2, type: 2}
+  trailTime: 0.5
+  trailWidth: 1
+  trailStartColor: {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 0.5137255}
+  trailEndColor: {r: 1, g: 1, b: 1, a: 0}
   alignToGround: 1
+  groundOffset: -0.78
   raycastHeight: 1
   raycastDistance: 2
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  overrideLifetime: 1
-  destroyAfterSeconds: 2

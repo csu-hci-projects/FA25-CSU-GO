@@ -189,17 +189,17 @@ MonoBehaviour:
   fleeDistance: 20
   fleeSearchRadius: 25
   moveForce: 30
-  maxSpeed: 20
+  maxSpeed: 18
   searchSamples: 50
   loseInterestTime: 2
   pathUpdateInterval: 0.3
   waypointReachDistance: 1.5
-  explosionPrefab: {fileID: 100006, guid: a49596ebf788acd4ab1281bffea444b1, type: 3}
+  explosionPrefab: {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
   explosionFxLifetime: 3
   explosionScale: 1
   deactivatedMaterial: {fileID: 2100000, guid: b242c006026397d4d845f834bc054911, type: 2}
   healthDropPrefab: {fileID: 6781029310454996017, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
-  healthDropSpawnOffset: {x: 0, y: 0.7, z: 0}
+  healthDropSpawnOffset: {x: 0, y: 1.25, z: 0}
   healthDropSpawnDelay: 0.2
 --- !u!114 &3170576475408001938
 MonoBehaviour:
@@ -213,17 +213,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 117d070b83588c04aa630e48839076ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallDustEffect
-  dustPrefab: {fileID: 100000, guid: 5a4630d3d41eb154fb963600cf40e826, type: 3}
-  prefabScale: 0.3
-  minSpeedForDust: 8
-  spawnInterval: 0.07
-  spawnDelay: 0.2
-  spawnOffset: {x: 0, y: 0, z: 0}
+  minSpeedForTrail: 10
+  trailMaterial: {fileID: 2100000, guid: e596d3e32e3bce5498584e8ce3be27c2, type: 2}
+  trailTime: 1.2
+  trailWidth: 1
+  trailStartColor: {r: 0.21698111, g: 0.21698111, b: 0.21698111, a: 0.5137255}
+  trailEndColor: {r: 1, g: 1, b: 1, a: 0}
   alignToGround: 1
+  groundOffset: -0.78
   raycastHeight: 1
   raycastDistance: 2
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  overrideLifetime: 1
-  destroyAfterSeconds: 2
