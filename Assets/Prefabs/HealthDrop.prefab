@@ -5061,6 +5061,7 @@ GameObject:
   - component: {fileID: 3273825327184034131}
   - component: {fileID: 5816198535013479821}
   - component: {fileID: 6674997883708194899}
+  - component: {fileID: 2613550835100718650}
   m_Layer: 0
   m_Name: HealthDrop
   m_TagString: Untagged
@@ -5154,11 +5155,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: d694ddc62d1e9bb428c06732009723d5, type: 3}
 --- !u!95 &5816198535013479821
@@ -5199,6 +5200,24 @@ Animation:
   m_AnimatePhysics: 0
   m_UpdateMode: 0
   m_CullingType: 0
+--- !u!114 &2613550835100718650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3092577982174053682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff2bccdf2c549c448b22fa6c59590a13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthPickup
+  healAmount: 20
+  pickupEffectPrefab: {fileID: 141433446842962269, guid: 9fe8f8b3288e45a44af36ff8aa04486e, type: 3}
+  effectScale: 3
+  effectLifetime: 3
+  pickupSound: {fileID: 0}
+  soundVolume: 1
 --- !u!1 &5546996613189319752
 GameObject:
   m_ObjectHideFlags: 0
