@@ -930,7 +930,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8919811423083635824}
   - component: {fileID: 8652210328450007523}
-  - component: {fileID: 8830786084060300962}
   m_Layer: 7
   m_Name: arms1
   m_TagString: Untagged
@@ -973,14 +972,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerModelSway
   cameraTransform: {fileID: 8012617594830533399}
   playerRb: {fileID: 6978653785452661592}
-  mouseSwayAmount: {x: 1.7, y: 1.2, z: 1.5}
-  mouseSwayClamp: {x: 10, y: 6, z: 8}
+  mouseSwayAmount: {x: 1.07, y: 1.02, z: 1.05}
+  mouseSwayClamp: {x: 12, y: 8, z: 10}
   mouseSensitivity: 1
   invertRollFromMouse: 1
-  movePitchPerSpeed: 0.3
-  moveRollPerSpeed: 0.3
-  moveYawPerSpeed: 0.3
-  moveTiltClamp: {x: 4, y: 1, z: 4}
+  movePitchPerSpeed: 0.11
+  moveRollPerSpeed: 0.11
+  moveYawPerSpeed: 0.11
+  moveTiltClamp: {x: 1, y: 1, z: 1}
   rotationSmooth: 12
   dampWhenSlow: 1
   slowSpeedThreshold: 0.4
@@ -998,25 +997,6 @@ MonoBehaviour:
   impactSpeedScale: 0.8
   impactSpringFrequency: 1.9
   impactDampingRatio: 1.07
---- !u!114 &8830786084060300962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1306131577706332354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f774098ca8ff5f24b99e8c9527fe6994, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerModelIdleSway
-  playerRb: {fileID: 6978653785452661592}
-  cameraTransform: {fileID: 8012617594830533399}
-  swayAmplitude: 0.012
-  swayFrequency: 0.75
-  swayLerpSpeed: 1.5
-  movementThreshold: 0.05
-  aimWeight: 1
 --- !u!1 &1314887069469842260
 GameObject:
   m_ObjectHideFlags: 0
