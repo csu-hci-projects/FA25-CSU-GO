@@ -972,14 +972,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerModelSway
   cameraTransform: {fileID: 8012617594830533399}
   playerRb: {fileID: 6978653785452661592}
-  mouseSwayAmount: {x: 1.07, y: 1.02, z: 1.05}
-  mouseSwayClamp: {x: 12, y: 8, z: 10}
+  mouseSwayAmount: {x: 0.7, y: 0.7, z: 0.7}
+  mouseSwayClamp: {x: 10, y: 6, z: 8}
   mouseSensitivity: 1
   invertRollFromMouse: 1
-  movePitchPerSpeed: 0.11
-  moveRollPerSpeed: 0.11
-  moveYawPerSpeed: 0.11
-  moveTiltClamp: {x: 1, y: 1, z: 1}
+  movePitchPerSpeed: 0.05
+  moveRollPerSpeed: 0.05
+  moveYawPerSpeed: 0.05
+  moveTiltClamp: {x: 0.5, y: 0.5, z: 0.5}
   rotationSmooth: 12
   dampWhenSlow: 1
   slowSpeedThreshold: 0.4
@@ -3309,41 +3309,41 @@ MonoBehaviour:
   fireRate: 9
   requireReleaseInSemi: 1
   useSlide: 1
-  slideTravel: 0.13
+  slideTravel: 0.15
   slideAxis: {x: 1, y: 0, z: 0}
-  slideBackTime: 0.075
-  slideReturnTime: 0.055
+  slideBackTime: 0.066
+  slideReturnTime: 0.066
   slideCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: 2.5454545
+      outSlope: 2.5454545
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.045833334
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: 0.06122461
+      outSlope: 0.06122461
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.23333335
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  recoilKick: 0.76
-  recoilYawPitch: {x: -18, y: -80}
-  recoilSnap: 24
-  recoilReturn: 32
-  maxPitch: 80
-  returnSharpness: 8.2
-  snapSharpness: 18
+  recoilKick: 0.5
+  recoilYawPitch: {x: 0, y: -35}
+  recoilSnap: 18
+  recoilReturn: 9
+  maxPitch: 70
+  returnSharpness: 12
+  snapSharpness: 32
   cameraPitch: {fileID: 1973028971032053693}
   cameraKick: 0
   cameraReturn: 0
