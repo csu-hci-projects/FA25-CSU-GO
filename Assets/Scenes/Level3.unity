@@ -284,7 +284,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.2
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 2b08f5c36720e67478fa4c3efb9ee7bd, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: d63132c91e0977041bb64f7831f1df4d, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &67084857
 Transform:
@@ -1171,8 +1171,8 @@ MonoBehaviour:
   fleeBallPrefab: {fileID: 4869017589782460716, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
   enemyBallCount: 1
   fleeBallCount: 0
-  minDistanceFromPlayer: 5
-  maxDistanceFromPlayer: 30
+  minDistanceFromPlayer: 30
+  maxDistanceFromPlayer: 60
   pathSampleCount: 10
   groundMask:
     serializedVersion: 2

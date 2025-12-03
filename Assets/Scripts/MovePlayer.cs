@@ -45,6 +45,8 @@ public class PlayerMovementFPSBhop : MonoBehaviour
     public float bhopSpeedDecayFactor = 0.3f;
     [Tooltip("Always-on decay (air or ground).")]
     public float constantDecayPerSecond = 0.5f;
+    [Tooltip("Grace period after landing before clamping to base speed (seconds).")]
+    public float clampGracePeriod = 0.3f;
 
     [Header("Air Control (CS-like)")]
     [Tooltip("How quickly your horizontal velocity can rotate toward the wish direction while airborne (radians/sec). ~8–16 is strong, CS-like.")]
@@ -303,9 +305,11 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         jumpPressed = false;
 
         // If we land and let the window expire without jumping, penalize once
+        // But add a grace period before clamping speed to base
         if (isGrounded && !punishedThisLanding && (Time.time - groundedSince) > bhopWindow)
         {
-            if (bhopBonus > 0f)
+            float timeGrounded = Time.time - groundedSince;
+            if (timeGrounded > clampGracePeriod && bhopBonus > 0f)
                 HardResetToBase();
             punishedThisLanding = true;
         }

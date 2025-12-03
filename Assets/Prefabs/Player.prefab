@@ -2706,7 +2706,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6850280072807127038}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.20143, y: 2.1, z: 1.82832}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3106,10 +3106,11 @@ MonoBehaviour:
   bhopBaseDecay: 0.88
   bhopSpeedDecayFactor: 1.22
   constantDecayPerSecond: 1.04
-  airTurnRate: 12
+  clampGracePeriod: 0.15
+  airTurnRate: 14
   preserveAirSpeed: 1
   externalImpulseDecay: 6
-  externalHorizontalClamp: 0
+  externalHorizontalClamp: 20
 --- !u!114 &4419222057944332917
 MonoBehaviour:
   m_ObjectHideFlags: 0
