@@ -189,12 +189,19 @@ MonoBehaviour:
   detectionRange: 25
   fleeDistance: 20
   fleeSearchRadius: 25
-  moveForce: 30
-  maxSpeed: 23
+  moveForce: 23
+  maxSpeed: 27
   searchSamples: 50
   loseInterestTime: 2
   pathUpdateInterval: 0.3
   waypointReachDistance: 1.5
+  enableWanderAfterLoseSight: 1
+  wanderStartDelay: 3
+  wanderRadius: 45
+  wanderMinPlayerDistance: 12
+  wanderMoveForce: 14
+  wanderMaxSpeed: 17
+  wanderReachDistance: 1
   explosionPrefab: {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
   explosionFxLifetime: 3
   explosionScale: 1
@@ -324,7 +331,7 @@ MonoBehaviour:
   sourceRb: {fileID: 4440447561908068630}
   radius: 0.5
   groundNormalSource: {fileID: 0}
-  spinMultiplier: 1.6
+  spinMultiplier: 2
   rotationSmoothing: 20
   autoDetectRadius: 1
   radiusSource: {fileID: 22097109135696029}

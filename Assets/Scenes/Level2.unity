@@ -704,6 +704,10 @@ PrefabInstance:
       value: 35.171055
       objectReference: {fileID: 0}
     - target: {fileID: 2072485360250374934, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_margin.z
+      value: -198.54712
+      objectReference: {fileID: 0}
+    - target: {fileID: 2072485360250374934, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_fontSizeBase
       value: 79
       objectReference: {fileID: 0}
@@ -1046,9 +1050,9 @@ Rigidbody:
   m_CorrespondingSourceObject: {fileID: 6978653785452661592, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
   m_PrefabInstance: {fileID: 352002345}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &390917941 stripped
+--- !u!4 &352002347 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 3095174120971164891, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4126921221401237003, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
   m_PrefabInstance: {fileID: 352002345}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &424206065
@@ -1081,7 +1085,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 67084857}
-  - {fileID: 645684347}
+  - {fileID: 1128033217}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &479486515 stripped
@@ -1428,64 +1432,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelLoader
   levelName: Level3
---- !u!1 &645684346
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 645684347}
-  - component: {fileID: 645684348}
-  m_Layer: 0
-  m_Name: NavMeshBallSpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &645684347
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 645684346}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.9613209, y: 0, z: 9.90826}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 424206066}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &645684348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 645684346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa439f24fda14dc4b9b3e1e40c061f2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NavMeshBallSpawner
-  enemyBallPrefab: {fileID: 2821268239385096503, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
-  fleeBallPrefab: {fileID: 4869017589782460716, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
-  enemyBallCount: 1
-  fleeBallCount: 0
-  minDistanceFromPlayer: 5
-  maxDistanceFromPlayer: 30
-  pathSampleCount: 10
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  player: {fileID: 390917941}
-  spawnOffset: {x: 0, y: 1, z: 0}
-  infiniteSpawning: 1
-  spawnInterval: 10
 --- !u!1001 &710901157
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2197,6 +2143,74 @@ Transform:
   - {fileID: 1442214063}
   m_Father: {fileID: 1937022177}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1128033216
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1128033217}
+  - component: {fileID: 1128033218}
+  m_Layer: 0
+  m_Name: NavMeshBallSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1128033217
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128033216}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.9613209, y: 0, z: 9.90826}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 424206066}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1128033218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128033216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa439f24fda14dc4b9b3e1e40c061f2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NavMeshBallSpawner
+  enemyBallPrefab: {fileID: 2821268239385096503, guid: 005b376ffc12e834fb3183d21645804d, type: 3}
+  fleeBallPrefab: {fileID: 4869017589782460716, guid: f3959d8a5a4e1524991e74afd2aa2798, type: 3}
+  warningEffectPrefab: {fileID: 3280519133390621005, guid: a71be3e7990efb040a07565c43cbb198, type: 3}
+  warningLeadTime: 3
+  warningEffectLifetime: 4
+  warningEffectScale: 2.3
+  warningEffectOffset: {x: 0, y: -1.1, z: 0}
+  enemyBallCount: 2
+  fleeBallCount: 1
+  maxEnemyBalls: 12
+  maxFleeBalls: 3
+  minDistanceFromPlayer: 45
+  maxDistanceFromPlayer: 90
+  navMeshSampleRadius: 5
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  requirePathFromPlayer: 0
+  player: {fileID: 352002347}
+  spawnOffset: {x: 0, y: 1, z: 0}
+  spawnJitterRadius: 1
+  infiniteSpawning: 1
+  spawnInterval: 7
+  recountInterval: 1
 --- !u!1 &1157054346 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1000012260637608, guid: 65feeeb562c61c744aa87b8eb394ffcf, type: 3}

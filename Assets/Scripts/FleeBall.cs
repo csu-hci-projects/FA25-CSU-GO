@@ -17,6 +17,22 @@ public class FleeBall : MonoBehaviour
     [SerializeField] float pathUpdateInterval = 0.3f;
     [SerializeField] float waypointReachDistance = 1.5f;
 
+    [Header("Wander (post-LOS)")]
+    [Tooltip("Enable wandering after losing sight and stopping fleeing.")]
+    [SerializeField] bool enableWanderAfterLoseSight = true;
+    [Tooltip("Seconds after losing interest before wandering begins.")]
+    [SerializeField] float wanderStartDelay = 0.75f;
+    [Tooltip("Radius around current position to sample random wander targets.")]
+    [SerializeField] float wanderRadius = 10f;
+    [Tooltip("Minimum horizontal distance from player for wander targets.")]
+    [SerializeField] float wanderMinPlayerDistance = 4f;
+    [Tooltip("Acceleration used while wandering.")]
+    [SerializeField] float wanderMoveForce = 12f;
+    [Tooltip("Max horizontal speed while wandering.")]
+    [SerializeField] float wanderMaxSpeed = 6f;
+    [Tooltip("Distance to consider the wander target reached, then pick a new one.")]
+    [SerializeField] float wanderReachDistance = 1.0f;
+
     [Header("Explosion")]
     [SerializeField] GameObject explosionPrefab;
     [Tooltip("Seconds before spawned explosion FX is auto-destroyed (<=0 keeps it).")]
@@ -43,6 +59,12 @@ public class FleeBall : MonoBehaviour
     bool exploded = false;
     bool hasLineOfSight = false;
     float lastSeenTime = 0f;
+    SpawnedEntityNotifier notifier;
+
+    // Wander state
+    bool isWandering = false;
+    Vector3 wanderTarget;
+    float wanderNextPickTime = 0f;
 
     NavMeshPath navPath;
     int currentCorner = 0;
@@ -59,6 +81,11 @@ public class FleeBall : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         navPath = new NavMeshPath();
+
+        // Setup notifier
+        notifier = GetComponent<SpawnedEntityNotifier>();
+        if (notifier == null) notifier = gameObject.AddComponent<SpawnedEntityNotifier>();
+        notifier.EntityType = SpawnedEntityNotifier.Type.Flee;
     }
 
     void Start()
@@ -92,6 +119,12 @@ public class FleeBall : MonoBehaviour
             if (Time.time - lastSeenTime > loseInterestTime)
             {
                 isFleeing = false;
+                // Prepare to start wandering after a short delay
+                if (enableWanderAfterLoseSight)
+                {
+                    isWandering = false; // will start after delay
+                    wanderNextPickTime = Time.time + Mathf.Max(0f, wanderStartDelay);
+                }
             }
         }
         else if (isFleeing && hasLineOfSight)
@@ -99,7 +132,15 @@ public class FleeBall : MonoBehaviour
             lastSeenTime = Time.time;
         }
 
-        if (!isFleeing) return;
+        if (!isFleeing)
+        {
+            // Handle post-LOS wandering
+            if (enableWanderAfterLoseSight)
+            {
+                HandleWander();
+            }
+            return;
+        }
 
         // Update flee path periodically
         if (Time.time >= nextPathUpdate)
@@ -123,6 +164,71 @@ public class FleeBall : MonoBehaviour
             Vector3 clamped = horizVel.normalized * maxSpeed;
             rb.linearVelocity = new Vector3(clamped.x, vel.y, clamped.z);
         }
+    }
+
+    void HandleWander()
+    {
+        // If not yet started and delay elapsed, pick a target
+        if (!isWandering && Time.time >= wanderNextPickTime)
+        {
+            isWandering = PickWanderTarget(out wanderTarget);
+        }
+        if (!isWandering) return;
+
+        Vector3 toTarget = wanderTarget - rb.position;
+        toTarget.y = 0f;
+        float dist = toTarget.magnitude;
+        if (dist <= wanderReachDistance)
+        {
+            // Reached: reset loop and pick a new target next frame
+            isWandering = false;
+            wanderNextPickTime = Time.time; // immediate repick allowed
+            return;
+        }
+
+        Vector3 dir = dist > 0.001f ? toTarget / dist : Vector3.zero;
+        rb.AddForce(dir * wanderMoveForce, ForceMode.Acceleration);
+
+        // Clamp wander horizontal speed
+        Vector3 vel = rb.linearVelocity;
+        Vector3 horizVel = new Vector3(vel.x, 0f, vel.z);
+        if (horizVel.magnitude > wanderMaxSpeed)
+        {
+            Vector3 clamped = horizVel.normalized * wanderMaxSpeed;
+            rb.linearVelocity = new Vector3(clamped.x, vel.y, clamped.z);
+        }
+    }
+
+    bool PickWanderTarget(out Vector3 target)
+    {
+        // Sample a random point around the player on NavMesh, staying near but not too close
+        Vector3 center = player != null ? player.position : rb.position;
+        for (int i = 0; i < 12; i++)
+        {
+            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            float radius = Random.Range(Mathf.Max(wanderMinPlayerDistance, wanderReachDistance * 2f), wanderRadius);
+            Vector3 offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+            Vector3 sample = center + offset;
+
+            if (NavMesh.SamplePosition(sample, out NavMeshHit hit, wanderRadius, NavMesh.AllAreas))
+            {
+                // Ensure horizontal min distance from player
+                if (player != null)
+                {
+                    Vector3 hp = new Vector3(hit.position.x, 0f, hit.position.z);
+                    Vector3 pp = new Vector3(player.position.x, 0f, player.position.z);
+                    if (Vector3.Distance(hp, pp) < wanderMinPlayerDistance) continue;
+                }
+                target = hit.position;
+                return true;
+            }
+        }
+        // Fallback around current position if sampling near player fails
+        float a2 = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+        float r2 = Random.Range(wanderReachDistance * 2f, wanderRadius);
+        Vector3 off2 = new Vector3(Mathf.Cos(a2), 0f, Mathf.Sin(a2)) * r2;
+        target = rb.position + off2;
+        return true;
     }
 
     void UpdateFleePath()
@@ -329,7 +435,15 @@ public class FleeBall : MonoBehaviour
             }
         }
 
-        Destroy(gameObject);
+        // FleeBall death likely not player kill (unless your gameplay defines it so)
+        if (notifier != null)
+        {
+            notifier.NotifyDeath(SpawnedEntityNotifier.DeathCause.Other);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void OnDrawGizmosSelected()

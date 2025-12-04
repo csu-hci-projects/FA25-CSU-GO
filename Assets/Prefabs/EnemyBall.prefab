@@ -188,7 +188,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBall
   detectionRange: 256
   stopRange: 1.5
-  moveForce: 35
   maxSpeed: 16.7
   sightHeight: 0.75
   losObstructionMask:
@@ -201,8 +200,13 @@ MonoBehaviour:
   explosionUpBoost: 2
   explosionRadius: 2.1
   explosionDamage: 10
+  explosionFuseTime: 8
+  fuseTintRoot: {fileID: 1585417079183548986}
+  fuseTintChildName: BombBall
   dropPrefab: {fileID: 6654893410515566851, guid: 9a906356721b8c7419845e6ba6afc03c, type: 3}
-  dropChance: 1
+  dropChance: 0.318
+  dropChanceOnPlayerShot: 0.915
+  maxActiveDrops: 10
   dropSpawnUpOffset: 1.5
   dropRandomRadius: 0.4
   dropGroundMask:
@@ -215,8 +219,25 @@ MonoBehaviour:
   pathUpdateInterval: 0.4
   waypointReachDistance: 1.5
   navMeshHeightOffset: 0.5
+  steerGain: 10
+  lateralDamping: 8
+  brakingDistance: 2.5
+  minApproachSpeed: 1.5
+  minAccel: 4
+  maxAccel: 18
+  groundProbeMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundProbeUp: 0.25
+  groundProbeDown: 1.25
+  airborneVerticalVelThreshold: 0.05
   jumpInterval: 2.5
   jumpForce: 22
+  maxJumpUpComponent: 0.4
+  minJumpUpComponent: 0.12
+  closeJumpDistance: 1.25
+  closeMaxJumpUpComponent: 0.22
+  maxJumpUpSpeed: 6
 --- !u!114 &9223322008830706856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -322,6 +343,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 38972d9a807375f4fbdbf2e076aa183f, type: 3}
   m_PrefabInstance: {fileID: 1585417079183685816}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1585417079183548986 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400002, guid: 38972d9a807375f4fbdbf2e076aa183f, type: 3}
+  m_PrefabInstance: {fileID: 1585417079183685816}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1585417079183719960 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 38972d9a807375f4fbdbf2e076aa183f, type: 3}
@@ -342,7 +368,7 @@ MonoBehaviour:
   sourceRb: {fileID: 8792215854897121314}
   radius: 0.5
   groundNormalSource: {fileID: 0}
-  spinMultiplier: 3.2
+  spinMultiplier: 3.4
   rotationSmoothing: 20
   autoDetectRadius: 1
   radiusSource: {fileID: 1585417079185973464}

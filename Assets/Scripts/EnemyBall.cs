@@ -6,7 +6,6 @@ public class EnemyBall : MonoBehaviour
     [Header("Chase")]
     [SerializeField] float detectionRange = 12f;
     [SerializeField] float stopRange = 1.5f;
-    [SerializeField] float moveForce = 25f;
     [SerializeField] float maxSpeed = 8f;
     [Tooltip("Height offset for line-of-sight raycasts.")]
     [SerializeField] float sightHeight = 0.75f;
@@ -29,11 +28,23 @@ public class EnemyBall : MonoBehaviour
     [Tooltip("Optional damage to apply to player once on explosion (0 = none).")]
     [SerializeField] int explosionDamage = 0;
 
+    [Header("Timed Explosion")]
+    [Tooltip("Seconds before the enemy auto-explodes after spawning. Set to 0 to disable.")]
+    [SerializeField, Min(0f)] float explosionFuseTime = 8f;
+    [Tooltip("Optional: Only tint this specific child hierarchy during the fuse. If null, uses name lookup below.")]
+    [SerializeField] Transform fuseTintRoot;
+    [Tooltip("If no explicit root is set, search for a child with this name and tint only that subtree.")]
+    [SerializeField] string fuseTintChildName = "BombBall";
+
     [Header("Drops")]
     [Tooltip("Optional prefab to drop on explosion (e.g., AmmoPickup or HealthPickup).")]
     [SerializeField] GameObject dropPrefab;
-    [Tooltip("Chance 0..1 to spawn a drop on explosion.")]
+    [Tooltip("Chance 0..1 to spawn a drop for explosions not caused by a player shot (e.g., fuse, collision, other). Default 35%.")]
     [Range(0f,1f)] [SerializeField] float dropChance = 0.35f;
+    [Tooltip("Chance 0..1 to spawn a drop when the enemy was shot by the player (default 100%).")]
+    [Range(0f,1f)] [SerializeField] float dropChanceOnPlayerShot = 1f;
+    [Tooltip("Maximum number of drop instances allowed in the scene at once.")]
+    [SerializeField] int maxActiveDrops = 10;
     [Tooltip("Small upward offset to keep the drop slightly above the ground.")]
     [SerializeField] float dropSpawnUpOffset = 0.1f;
     [Tooltip("Horizontal random radius for drop spawn to avoid stacking.")]
@@ -100,10 +111,19 @@ public class EnemyBall : MonoBehaviour
     Transform player;
     bool hasAggro = false;
     bool exploded = false;
+    SpawnedEntityNotifier notifier;
 
     NavMeshPath navPath;
     int currentCorner = 0;
     float nextPathUpdate = 0f;
+    // Fuse visuals
+    readonly System.Collections.Generic.List<Renderer> fuseRenderers = new System.Collections.Generic.List<Renderer>();
+    readonly System.Collections.Generic.List<Color> fuseBaseColors = new System.Collections.Generic.List<Color>();
+    MaterialPropertyBlock fuseColorBlock;
+    float fuseElapsed = 0f;
+    bool fuseActive = false;
+    // Global tracking for active drops
+    static System.Collections.Generic.List<GameObject> s_activeDrops;
 
     void Awake()
     {
@@ -116,6 +136,19 @@ public class EnemyBall : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         navPath = new NavMeshPath();
+
+        // Setup notifier
+        notifier = GetComponent<SpawnedEntityNotifier>();
+        if (notifier == null) notifier = gameObject.AddComponent<SpawnedEntityNotifier>();
+        notifier.EntityType = SpawnedEntityNotifier.Type.Enemy;
+
+        InitializeFuseRenderers();
+        fuseColorBlock = new MaterialPropertyBlock();
+
+        if (s_activeDrops == null)
+        {
+            s_activeDrops = new System.Collections.Generic.List<GameObject>(32);
+        }
     }
 
     void Start()
@@ -124,6 +157,13 @@ public class EnemyBall : MonoBehaviour
         if (playerObj != null)
         {
             player = playerObj.transform;
+        }
+
+        fuseElapsed = 0f;
+        fuseActive = explosionFuseTime > 0f;
+        if (fuseActive)
+        {
+            UpdateFuseColor(0f);
         }
     }
 
@@ -205,6 +245,22 @@ public class EnemyBall : MonoBehaviour
         else
         {
             NavMeshMove();
+        }
+    }
+
+    void Update()
+    {
+        if (!fuseActive || exploded) return;
+
+        fuseElapsed += Time.deltaTime;
+        float normalized = explosionFuseTime > 0f ? Mathf.Clamp01(fuseElapsed / explosionFuseTime) : 1f;
+        UpdateFuseColor(normalized);
+
+        if (fuseElapsed >= explosionFuseTime)
+        {
+            fuseActive = false;
+            // Fuse timeout explosion: route through TriggerExplosion with explicit cause
+            TriggerExplosion(false, ExplosionCause.Fuse);
         }
     }
 
@@ -433,7 +489,7 @@ public class EnemyBall : MonoBehaviour
         }
     }
 
-    public void TriggerExplosion(bool ignorePlayerEffect)
+    public void TriggerExplosion(bool ignorePlayerEffect, ExplosionCause cause = ExplosionCause.Other)
     {
         if (exploded) return;
         exploded = true;
@@ -463,8 +519,21 @@ public class EnemyBall : MonoBehaviour
             }
         }
 
-        TrySpawnDrop();
-        Destroy(gameObject);
+        // Finalize reported cause: prefer explicit cause parameter, otherwise infer
+        ExplosionCause finalCause = cause != ExplosionCause.Other ? cause : (ignorePlayerEffect ? ExplosionCause.Player : ExplosionCause.Other);
+        TrySpawnDrop(finalCause);
+        // Notify death to the spawner: consider PlayerShot and Player as player kills
+        if (notifier != null)
+        {
+            var nCause = (finalCause == ExplosionCause.Player || finalCause == ExplosionCause.PlayerShot)
+                         ? SpawnedEntityNotifier.DeathCause.Player
+                         : SpawnedEntityNotifier.DeathCause.Other;
+            notifier.NotifyDeath(nCause);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void TriggerExplosionAffectPlayer(Rigidbody playerRb)
@@ -487,14 +556,39 @@ public class EnemyBall : MonoBehaviour
             ApplyExplosionDamage(playerRb.gameObject);
         }
 
-        TrySpawnDrop();
-        Destroy(gameObject);
+        TrySpawnDrop(ExplosionCause.PlayerCollision);
+        // This explosion was due to collision with player, treat as Other (not player kill)
+        if (notifier != null)
+        {
+            notifier.NotifyDeath(SpawnedEntityNotifier.DeathCause.Other);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    void TrySpawnDrop()
+    public enum ExplosionCause { Other, Player, PlayerCollision, PlayerShot, Fuse }
+
+    void TrySpawnDrop(ExplosionCause cause)
     {
         if (dropPrefab == null) return;
-        if (Random.value > Mathf.Clamp01(dropChance)) return;
+        // Prune null/destroyed entries from tracking list
+        if (s_activeDrops != null)
+        {
+            for (int i = s_activeDrops.Count - 1; i >= 0; i--)
+            {
+                if (s_activeDrops[i] == null) s_activeDrops.RemoveAt(i);
+            }
+            if (s_activeDrops.Count >= Mathf.Max(0, maxActiveDrops)) return;
+        }
+        float chance = dropChance;
+        // Use 100% drop chance for both PlayerShot and Player causes
+        if (cause == ExplosionCause.PlayerShot || cause == ExplosionCause.Player)
+        {
+            chance = dropChanceOnPlayerShot;
+        }
+        if (Random.value > Mathf.Clamp01(chance)) return;
 
         // Base point near where the enemy exploded
         Vector2 rnd = Random.insideUnitCircle * Mathf.Max(0f, dropRandomRadius);
@@ -506,7 +600,8 @@ public class EnemyBall : MonoBehaviour
         if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, rayDistance, dropGroundMask, QueryTriggerInteraction.Ignore))
         {
             Vector3 pos = hit.point + Vector3.up * Mathf.Max(0f, dropSpawnUpOffset);
-            Instantiate(dropPrefab, pos, Quaternion.identity);
+            var drop = Instantiate(dropPrefab, pos, Quaternion.identity);
+            if (s_activeDrops != null && drop != null) s_activeDrops.Add(drop);
             return;
         }
 
@@ -514,12 +609,14 @@ public class EnemyBall : MonoBehaviour
         if (NavMesh.SamplePosition(basePos, out NavMeshHit nmHit, 5f, NavMesh.AllAreas))
         {
             Vector3 pos = nmHit.position + Vector3.up * Mathf.Max(0f, dropSpawnUpOffset);
-            Instantiate(dropPrefab, pos, Quaternion.identity);
+            var drop = Instantiate(dropPrefab, pos, Quaternion.identity);
+            if (s_activeDrops != null && drop != null) s_activeDrops.Add(drop);
             return;
         }
 
         // Last resort: place at current height with minimal lift
-        Instantiate(dropPrefab, basePos + Vector3.up * Mathf.Max(0f, dropSpawnUpOffset), Quaternion.identity);
+        var finalDrop = Instantiate(dropPrefab, basePos + Vector3.up * Mathf.Max(0f, dropSpawnUpOffset), Quaternion.identity);
+        if (s_activeDrops != null && finalDrop != null) s_activeDrops.Add(finalDrop);
     }
 
     void ApplyKnockback(Rigidbody playerRb)
@@ -599,6 +696,55 @@ public class EnemyBall : MonoBehaviour
         if (ph != null)
         {
             ph.TakeDamage(explosionDamage);
+        }
+    }
+
+    void InitializeFuseRenderers()
+    {
+        fuseRenderers.Clear();
+        fuseBaseColors.Clear();
+
+        // Determine the subtree to tint
+        Transform root = fuseTintRoot;
+        if (root == null && !string.IsNullOrEmpty(fuseTintChildName))
+        {
+            var t = transform.Find(fuseTintChildName);
+            if (t != null) root = t;
+        }
+
+        Renderer[] renderers = root != null ? root.GetComponentsInChildren<Renderer>() : GetComponentsInChildren<Renderer>();
+        foreach (var rend in renderers)
+        {
+            if (rend == null) continue;
+            fuseRenderers.Add(rend);
+            Color baseColor = Color.white;
+            var mat = rend.sharedMaterial;
+            if (mat != null)
+            {
+                if (mat.HasProperty("_Color"))
+                    baseColor = mat.color;
+                else if (mat.HasProperty("_BaseColor"))
+                    baseColor = mat.GetColor("_BaseColor");
+            }
+            fuseBaseColors.Add(baseColor);
+        }
+    }
+
+    void UpdateFuseColor(float normalizedFuse)
+    {
+        if (fuseRenderers.Count == 0) return;
+
+        float ratio = Mathf.Clamp01(normalizedFuse);
+        for (int i = 0; i < fuseRenderers.Count; i++)
+        {
+            var rend = fuseRenderers[i];
+            if (rend == null) continue;
+            Color baseColor = fuseBaseColors[i];
+            Color tinted = Color.Lerp(baseColor, Color.red, ratio);
+            fuseColorBlock.Clear();
+            fuseColorBlock.SetColor("_Color", tinted);
+            fuseColorBlock.SetColor("_BaseColor", tinted);
+            rend.SetPropertyBlock(fuseColorBlock);
         }
     }
 
