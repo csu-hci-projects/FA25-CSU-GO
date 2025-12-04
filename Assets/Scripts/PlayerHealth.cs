@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -10,6 +13,11 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] Slider healthSlider;
     [SerializeField] TextMeshProUGUI healthLabel;
     [SerializeField] string gameOverSceneName = ""; // if empty, reloads current scene
+#if UNITY_EDITOR
+    [Header("Game Over Scene (Drag)")]
+    [Tooltip("Drag a Scene asset here; its name will be used for loading.")]
+    [SerializeField] SceneAsset gameOverSceneAsset;
+#endif
     [SerializeField] float deathDelay = 0.5f;
 
     bool isDead = false;
@@ -63,6 +71,17 @@ public class PlayerHealth : MonoBehaviour
 
     void LoadGameOverScene()
     {
+#if UNITY_EDITOR
+        // Keep the string in sync with dragged asset name in editor
+        if (gameOverSceneAsset != null)
+        {
+            // Use scene asset name for loading
+            gameOverSceneName = gameOverSceneAsset.name;
+        }
+#endif
+        // Ensure cursor is available on title/game-over screen
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         if (!string.IsNullOrEmpty(gameOverSceneName))
         {
             SceneManager.LoadScene(gameOverSceneName);
@@ -72,4 +91,15 @@ public class PlayerHealth : MonoBehaviour
         var active = SceneManager.GetActiveScene();
         SceneManager.LoadScene(active.name);
     }
+
+#if UNITY_EDITOR
+    void OnValidate()
+    {
+        // Sync scene name when a scene asset is assigned in the inspector
+        if (gameOverSceneAsset != null)
+        {
+            gameOverSceneName = gameOverSceneAsset.name;
+        }
+    }
+#endif
 }

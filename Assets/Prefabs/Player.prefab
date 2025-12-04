@@ -3159,7 +3159,8 @@ MonoBehaviour:
   currentHealth: 100
   healthSlider: {fileID: 0}
   healthLabel: {fileID: 0}
-  gameOverSceneName: 
+  gameOverSceneName: Title Screen
+  gameOverSceneAsset: {fileID: 102900000, guid: 8ad5b74c52851439aa85329e34d52c1a, type: 3}
   deathDelay: 0.5
 --- !u!1 &7155658872154737126
 GameObject:

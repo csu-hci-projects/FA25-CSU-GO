@@ -3,6 +3,15 @@ using UnityEngine.SceneManagement; // Required to change scenes
 
 public class MainMenuController : MonoBehaviour
 {
+    void OnEnable()
+    {
+        // Ensure cursor is usable for UI interaction
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        // Restore time scale in case gameplay paused/time frozen
+        if (Time.timeScale == 0f) Time.timeScale = 1f;
+    }
+
     // Call this function to load the game scene
     public void PlayGame()
     {
