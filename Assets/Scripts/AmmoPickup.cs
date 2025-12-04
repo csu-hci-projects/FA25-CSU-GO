@@ -32,6 +32,12 @@ public class AmmoPickup : MonoBehaviour
             return;
         }
 
+        // If ammo is already at max, do not collect
+        if (ammo.CurrentAmmo >= ammo.MaxAmmo)
+        {
+            return;
+        }
+
         collected = true;
         ammo.AddAmmo(ammoAmount);
 

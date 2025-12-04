@@ -42,6 +42,12 @@ public class HealthPickup : MonoBehaviour
             return;
         }
 
+        // If player health is already max, do not collect
+        if (playerHealth.IsAtMax)
+        {
+            return;
+        }
+
         // Mark as collected to prevent double-pickup
         collected = true;
 

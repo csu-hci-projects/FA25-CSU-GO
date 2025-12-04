@@ -2125,8 +2125,8 @@ MonoBehaviour:
   enemyBallCount: 2
   fleeBallCount: 1
   maxEnemyBalls: 12
-  maxFleeBalls: 3
-  minDistanceFromPlayer: 45
+  maxFleeBalls: 6
+  minDistanceFromPlayer: 30
   maxDistanceFromPlayer: 90
   navMeshSampleRadius: 5
   groundMask:

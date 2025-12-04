@@ -20,6 +20,9 @@ public class PlayerHealth : MonoBehaviour
         UpdateUI();
     }
 
+    public int CurrentHealth => currentHealth;
+    public bool IsAtMax => currentHealth >= MaxHealth;
+
     public void TakeDamage(int amount)
     {
         if (amount <= 0) return;
