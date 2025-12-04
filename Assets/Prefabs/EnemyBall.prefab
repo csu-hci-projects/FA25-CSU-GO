@@ -201,13 +201,22 @@ MonoBehaviour:
   explosionUpBoost: 2
   explosionRadius: 2.1
   explosionDamage: 10
+  dropPrefab: {fileID: 6654893410515566851, guid: 9a906356721b8c7419845e6ba6afc03c, type: 3}
+  dropChance: 1
+  dropSpawnUpOffset: 1.5
+  dropRandomRadius: 0.4
+  dropGroundMask:
+    serializedVersion: 2
+    m_Bits: 8
+  dropRaycastAbove: 3
+  dropRaycastBelow: 10
   knockbackMaxHorizontalSpeed: 18
   knockbackMaxUpSpeed: 18
   pathUpdateInterval: 0.4
   waypointReachDistance: 1.5
   navMeshHeightOffset: 0.5
   jumpInterval: 2.5
-  jumpForce: 21
+  jumpForce: 22
 --- !u!114 &9223322008830706856
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -9936,6 +9936,7 @@ GameObject:
   - component: {fileID: 8934681581951603768}
   - component: {fileID: 8031995296851158908}
   - component: {fileID: 4859605668856436569}
+  - component: {fileID: 2894755084769569833}
   m_Layer: 0
   m_Name: AmmoDrop
   m_TagString: Untagged
@@ -10031,7 +10032,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
@@ -10074,6 +10075,24 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2894755084769569833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2713884669396008021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b99c62b2f35fca4b8cc296cab92577b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AmmoPickup
+  ammoAmount: 16
+  pickupEffectPrefab: {fileID: 141433446842962269, guid: 9fe8f8b3288e45a44af36ff8aa04486e, type: 3}
+  effectScale: 1
+  effectLifetime: 2
+  pickupSound: {fileID: 0}
+  soundVolume: 1
 --- !u!1 &6093553817632326848
 GameObject:
   m_ObjectHideFlags: 0

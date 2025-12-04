@@ -103,6 +103,12 @@ public class FpsGunShootAnim : MonoBehaviour
         }
     }
 
+    [Header("Ammo")]
+    [Tooltip("Optional ammo system; if assigned, firing consumes ammo and blocks at zero.")]
+    public AmmoSystem ammoSystem;
+    [Tooltip("Ammo consumed per shot.")]
+    public int ammoPerShot = 1;
+
     void Update()
     {
         // --- FIRE INPUT & RATE LIMIT ---
@@ -123,6 +129,17 @@ public class FpsGunShootAnim : MonoBehaviour
 
         if (pressed && canShootNow)
         {
+            // Block if ammo system exists and has no ammo
+            if (ammoSystem != null)
+            {
+                if (!ammoSystem.CanConsume(ammoPerShot))
+                {
+                    // No ammo: do not play slide, recoil, tracer, or muzzle flash
+                    return;
+                }
+                ammoSystem.Consume(ammoPerShot);
+            }
+
             Fire();
             nextFire = Time.time + minDelay;
 

@@ -848,7 +848,7 @@ Transform:
   m_GameObject: {fileID: 1000961165413003973}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -2.79, y: 0.5, z: 79.07}
+  m_LocalPosition: {x: -2.79, y: 0.5, z: 69.08}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2942,7 +2942,8 @@ GameObject:
   - component: {fileID: 6978653785452661592}
   - component: {fileID: 4451801684320042284}
   - component: {fileID: 4419222057944332917}
-  - component: {fileID: 3908231648173701891}
+  - component: {fileID: 3777963179729519173}
+  - component: {fileID: 5978209100862542608}
   m_Layer: 0
   m_Name: PlayerHitboxes
   m_TagString: Player
@@ -3123,7 +3124,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47823290bde0e37478464480a16139b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRotate
---- !u!114 &3908231648173701891
+--- !u!114 &3777963179729519173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7077414327142768973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04bbefc51ca910d4990807188c88741d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AmmoSystem
+  maxAmmo: 120
+  startingAmmo: 8
+  ammoLabel: {fileID: 0}
+  ammoSlider: {fileID: 0}
+  pickupSound: {fileID: 0}
+  pickupVolume: 1
+  dryFireSound: {fileID: 0}
+  dryFireVolume: 1
+--- !u!114 &5978209100862542608
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3358,6 +3379,8 @@ MonoBehaviour:
   weaponYawPitch: {x: 0.35, y: -0.9}
   weaponReturnSharpness: 28
   weaponSnapSharpness: 36
+  ammoSystem: {fileID: 3777963179729519173}
+  ammoPerShot: 1
   shootCamera: {fileID: 3984145171397742502}
   muzzle: {fileID: 2868224210781979091}
   hitscanRange: 200

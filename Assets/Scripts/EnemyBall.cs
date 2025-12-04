@@ -29,6 +29,22 @@ public class EnemyBall : MonoBehaviour
     [Tooltip("Optional damage to apply to player once on explosion (0 = none).")]
     [SerializeField] int explosionDamage = 0;
 
+    [Header("Drops")]
+    [Tooltip("Optional prefab to drop on explosion (e.g., AmmoPickup or HealthPickup).")]
+    [SerializeField] GameObject dropPrefab;
+    [Tooltip("Chance 0..1 to spawn a drop on explosion.")]
+    [Range(0f,1f)] [SerializeField] float dropChance = 0.35f;
+    [Tooltip("Small upward offset to keep the drop slightly above the ground.")]
+    [SerializeField] float dropSpawnUpOffset = 0.1f;
+    [Tooltip("Horizontal random radius for drop spawn to avoid stacking.")]
+    [SerializeField] float dropRandomRadius = 0.4f;
+    [Tooltip("Layers considered ground for positioning the drop (raycast down).")]
+    [SerializeField] LayerMask dropGroundMask = ~0;
+    [Tooltip("How far above to start the ground ray.")]
+    [SerializeField] float dropRaycastAbove = 3f;
+    [Tooltip("How far below to search for ground.")]
+    [SerializeField] float dropRaycastBelow = 10f;
+
     [Header("Knockback Limits")] 
     [Tooltip("Hard cap for player's horizontal speed right after knockback (m/s).")]
     [SerializeField] float knockbackMaxHorizontalSpeed = 8f;
@@ -328,6 +344,7 @@ public class EnemyBall : MonoBehaviour
             }
         }
 
+        TrySpawnDrop();
         Destroy(gameObject);
     }
 
@@ -351,7 +368,39 @@ public class EnemyBall : MonoBehaviour
             ApplyExplosionDamage(playerRb.gameObject);
         }
 
+        TrySpawnDrop();
         Destroy(gameObject);
+    }
+
+    void TrySpawnDrop()
+    {
+        if (dropPrefab == null) return;
+        if (Random.value > Mathf.Clamp01(dropChance)) return;
+
+        // Base point near where the enemy exploded
+        Vector2 rnd = Random.insideUnitCircle * Mathf.Max(0f, dropRandomRadius);
+        Vector3 basePos = transform.position + new Vector3(rnd.x, 0f, rnd.y);
+
+        // Raycast down to find ground
+        Vector3 rayStart = basePos + Vector3.up * Mathf.Max(0f, dropRaycastAbove);
+        float rayDistance = Mathf.Max(0.01f, dropRaycastAbove + dropRaycastBelow);
+        if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, rayDistance, dropGroundMask, QueryTriggerInteraction.Ignore))
+        {
+            Vector3 pos = hit.point + Vector3.up * Mathf.Max(0f, dropSpawnUpOffset);
+            Instantiate(dropPrefab, pos, Quaternion.identity);
+            return;
+        }
+
+        // Fallback: Snap to NavMesh height if available
+        if (NavMesh.SamplePosition(basePos, out NavMeshHit nmHit, 5f, NavMesh.AllAreas))
+        {
+            Vector3 pos = nmHit.position + Vector3.up * Mathf.Max(0f, dropSpawnUpOffset);
+            Instantiate(dropPrefab, pos, Quaternion.identity);
+            return;
+        }
+
+        // Last resort: place at current height with minimal lift
+        Instantiate(dropPrefab, basePos + Vector3.up * Mathf.Max(0f, dropSpawnUpOffset), Quaternion.identity);
     }
 
     void ApplyKnockback(Rigidbody playerRb)
