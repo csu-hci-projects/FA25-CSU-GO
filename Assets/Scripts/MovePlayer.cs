@@ -305,13 +305,18 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         jumpPressed = false;
 
         // If we land and let the window expire without jumping, penalize once
-        // But add a grace period before clamping speed to base
-        if (isGrounded && !punishedThisLanding && (Time.time - groundedSince) > bhopWindow)
+        // Only mark as punished when we actually clamp (after grace period)
+        if (isGrounded && (Time.time - groundedSince) > bhopWindow)
         {
             float timeGrounded = Time.time - groundedSince;
-            if (timeGrounded > clampGracePeriod && bhopBonus > 0f)
-                HardResetToBase();
-            punishedThisLanding = true;
+            if (!punishedThisLanding && timeGrounded > clampGracePeriod)
+            {
+                if (bhopBonus > 0f)
+                {
+                    HardResetToBase();
+                }
+                punishedThisLanding = true;
+            }
         }
 
         // --- Decay mechanics ---

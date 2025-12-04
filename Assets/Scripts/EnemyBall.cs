@@ -57,9 +57,43 @@ public class EnemyBall : MonoBehaviour
     [Tooltip("Height offset above NavMesh surface to prevent clipping into ground.")]
     [SerializeField] float navMeshHeightOffset = 0.5f;
 
+    [Header("Chase Steering")]
+    [Tooltip("How aggressively velocity is steered toward the target direction (acceleration gain).")]
+    [SerializeField] float steerGain = 10f;
+    [Tooltip("Damping applied to lateral (sideways) velocity to prevent orbiting.")]
+    [SerializeField] float lateralDamping = 8f;
+    [Tooltip("Within this distance, reduce desired speed to help arriving and reduce circling.")]
+    [SerializeField] float brakingDistance = 2.5f;
+    [Tooltip("Minimum approach speed when inside braking distance, to avoid stalling completely.")]
+    [SerializeField] float minApproachSpeed = 1.5f;
+    [Tooltip("Minimum acceleration toward desired speed (m/s^2).")]
+    [SerializeField] float minAccel = 4f;
+    [Tooltip("Max acceleration applied when speeding up (m/s^2).")]
+    [SerializeField] float maxAccel = 18f;
+
+    [Header("Ground Probe (Jump Safety)")]
+    [Tooltip("Layers treated as ground when deciding if we're near the floor (affects NavMeshMove vertical snapping).")]
+    [SerializeField] LayerMask groundProbeMask = ~0;
+    [Tooltip("How far above the body to start the ground ray.")]
+    [SerializeField] float groundProbeUp = 0.25f;
+    [Tooltip("How far below to search for ground.")]
+    [SerializeField] float groundProbeDown = 1.25f;
+    [Tooltip("If vertical speed magnitude exceeds this, we consider the ball airborne and won't snap to ground.")]
+    [SerializeField] float airborneVerticalVelThreshold = 0.05f;
+
     [Header("Jump Attack")]
     [SerializeField] float jumpInterval = 1.2f;
     [SerializeField] float jumpForce = 8f;
+    [Tooltip("Clamp for upward component of jump direction (far from player). 0..1 fraction of unit vector.")]
+    [SerializeField] float maxJumpUpComponent = 0.4f;
+    [Tooltip("Minimum upward component so jumps always have some lift.")]
+    [SerializeField] float minJumpUpComponent = 0.12f;
+    [Tooltip("Within this distance to player, cap upward component more aggressively.")]
+    [SerializeField] float closeJumpDistance = 1.25f;
+    [Tooltip("Max upward component when very close to the player.")]
+    [SerializeField] float closeMaxJumpUpComponent = 0.22f;
+    [Tooltip("Clamp for upward velocity immediately after jump to prevent launch.")]
+    [SerializeField] float maxJumpUpSpeed = 6f;
     float nextJumpTime = 0f;
 
     Rigidbody rb;
@@ -132,9 +166,34 @@ public class EnemyBall : MonoBehaviour
             if (toPlayer.sqrMagnitude > 0.5f)
             {
                 // Add slight randomization to jump direction
-                Vector3 randomOffset = new Vector3(Random.Range(-0.15f, 0.15f), Random.Range(-0.05f, 0.05f), Random.Range(-0.15f, 0.15f));
-                Vector3 jumpDir = (toPlayer + randomOffset).normalized;
+                Vector3 randomOffset = new Vector3(Random.Range(-0.15f, 0.15f), 0f, Random.Range(-0.15f, 0.15f));
+
+                float dist = toPlayer.magnitude;
+                float upCap = dist < closeJumpDistance ? closeMaxJumpUpComponent : maxJumpUpComponent;
+                upCap = Mathf.Clamp01(upCap);
+                float upMin = Mathf.Clamp01(minJumpUpComponent);
+
+                // Build primarily horizontal jump direction, then inject controlled upward component
+                Vector3 toPlayerXZ = new Vector3(toPlayer.x, 0f, toPlayer.z) + new Vector3(randomOffset.x, 0f, randomOffset.z);
+                Vector3 horizDir = toPlayerXZ.sqrMagnitude > 1e-4f ? toPlayerXZ.normalized : Vector3.forward;
+
+                // Choose an upward fraction between [upMin, upCap]
+                float upFrac = Mathf.Clamp((toPlayer.y > 0f) ? (toPlayer.y / Mathf.Max(0.01f, dist)) : upMin, upMin, upCap);
+
+                // Combine horizontal and up, then normalize
+                Vector3 jumpDir = (horizDir + Vector3.up * upFrac).normalized;
                 rb.AddForce(jumpDir * jumpForce, ForceMode.Impulse);
+
+                // Clamp excessive upward velocity immediately after jump
+                if (maxJumpUpSpeed > 0f)
+                {
+                    Vector3 vAfter = rb.linearVelocity;
+                    if (vAfter.y > maxJumpUpSpeed)
+                    {
+                        vAfter.y = maxJumpUpSpeed;
+                        rb.linearVelocity = vAfter;
+                    }
+                }
             }
             nextJumpTime = Time.time + jumpInterval;
         }
@@ -177,11 +236,57 @@ public class EnemyBall : MonoBehaviour
         if (toPlayer.sqrMagnitude < 0.0001f) return;
 
         Vector3 dir = toPlayer.normalized;
-        rb.AddForce(dir * moveForce, ForceMode.Acceleration);
 
-        // Clamp horizontal speed
+        // Desired speed: slow down as we get close to reduce overshoot/orbiting
+        float dist = toPlayer.magnitude;
+        float desiredSpeed = maxSpeed;
+        if (brakingDistance > 0.01f && dist < brakingDistance)
+        {
+            float t = Mathf.Clamp01(dist / brakingDistance);
+            desiredSpeed = Mathf.Lerp(minApproachSpeed, maxSpeed, t);
+        }
+
+        // Ensure we at least match player's horizontal speed (so we can catch up)
+        float playerHorizSpeed = 0f;
+        if (player != null)
+        {
+            var prb = player.GetComponent<Rigidbody>();
+            if (prb != null)
+            {
+                Vector3 pv = prb.linearVelocity;
+                playerHorizSpeed = new Vector3(pv.x, 0f, pv.z).magnitude;
+            }
+        }
+        desiredSpeed = Mathf.Max(desiredSpeed, playerHorizSpeed);
+
+        // Current horizontal velocity
         Vector3 vel = rb.linearVelocity;
         Vector3 horizVel = new Vector3(vel.x, 0f, vel.z);
+
+        // Velocity matching steering (seek)
+        Vector3 desiredVel = dir * desiredSpeed;
+        Vector3 velError = desiredVel - horizVel;
+
+        // Limit acceleration magnitude to keep a gradual speed-up
+        float accelGain = Mathf.Max(0f, steerGain);
+        Vector3 desiredAccel = velError * accelGain;
+        float aMag = desiredAccel.magnitude;
+        float minA = Mathf.Max(0f, minAccel);
+        float maxA = Mathf.Max(minA, maxAccel);
+        if (aMag > maxA)
+            desiredAccel = desiredAccel.normalized * maxA;
+        else if (aMag < minA)
+            desiredAccel = desiredAccel.normalized * minA;
+
+        rb.AddForce(desiredAccel, ForceMode.Acceleration);
+
+        // Lateral damping: kill sideways component to avoid orbiting
+        Vector3 lateral = horizVel - Vector3.Project(horizVel, dir);
+        rb.AddForce(-lateral * Mathf.Max(0f, lateralDamping), ForceMode.Acceleration);
+
+        // Clamp horizontal speed
+        vel = rb.linearVelocity;
+        horizVel = new Vector3(vel.x, 0f, vel.z);
         if (horizVel.magnitude > maxSpeed)
         {
             Vector3 clamped = horizVel.normalized * maxSpeed;
@@ -201,6 +306,10 @@ public class EnemyBall : MonoBehaviour
             return;
         }
 
+        // Determine if we're near ground; if airborne, avoid snapping Y to NavMesh height
+        bool nearGround = IsNearGround(out _);
+        bool airborne = Mathf.Abs(rb.linearVelocity.y) > airborneVerticalVelThreshold || !nearGround;
+
         float speed = Mathf.Max(0.01f, maxSpeed);
         Vector3 desiredStep = targetDirection * speed * Time.fixedDeltaTime;
         Vector3 candidate = rb.position + desiredStep;
@@ -208,8 +317,9 @@ public class EnemyBall : MonoBehaviour
         // Sample NavMesh to stay on surface and prevent clipping through floor
         if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
-            // Keep the NavMesh Y position plus offset to stay above surface
-            candidate = new Vector3(candidate.x, hit.position.y + navMeshHeightOffset, candidate.z);
+            // Keep the NavMesh Y position plus offset only if grounded; preserve Y while airborne
+            float newY = airborne ? rb.position.y : hit.position.y + navMeshHeightOffset;
+            candidate = new Vector3(candidate.x, newY, candidate.z);
             rb.MovePosition(candidate);
         }
         else
@@ -217,13 +327,22 @@ public class EnemyBall : MonoBehaviour
             // If candidate is off NavMesh, try to get back onto it from current position
             if (NavMesh.SamplePosition(rb.position, out NavMeshHit currentHit, 5f, NavMesh.AllAreas))
             {
-                Vector3 backOnMesh = new Vector3(rb.position.x, currentHit.position.y + navMeshHeightOffset, rb.position.z);
+                // Preserve Y while airborne; otherwise snap to mesh height + offset
+                float newY = airborne ? rb.position.y : currentHit.position.y + navMeshHeightOffset;
+                Vector3 backOnMesh = new Vector3(rb.position.x, newY, rb.position.z);
                 rb.MovePosition(backOnMesh);
             }
         }
 
         // Zero horizontal velocity so physics doesn't drift us off-path
         // (Do not touch vertical velocity so jumping works)
+    }
+
+    bool IsNearGround(out RaycastHit hit)
+    {
+        Vector3 origin = rb.position + Vector3.up * Mathf.Max(0f, groundProbeUp);
+        float rayDist = Mathf.Max(0.01f, groundProbeUp + groundProbeDown);
+        return Physics.Raycast(origin, Vector3.down, out hit, rayDist, groundProbeMask, QueryTriggerInteraction.Ignore);
     }
 
     void UpdatePath()
