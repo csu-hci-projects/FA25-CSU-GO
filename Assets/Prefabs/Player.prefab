@@ -3106,7 +3106,7 @@ MonoBehaviour:
   bhopBaseDecay: 0.88
   bhopSpeedDecayFactor: 1.22
   constantDecayPerSecond: 1.04
-  clampGracePeriod: 0.15
+  clampGracePeriod: 0.2
   airTurnRate: 14
   preserveAirSpeed: 1
   externalImpulseDecay: 6
