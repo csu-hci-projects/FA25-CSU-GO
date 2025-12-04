@@ -776,6 +776,10 @@ PrefabInstance:
       propertyPath: screenDotSpawner
       value: 
       objectReference: {fileID: 6656145241279594898}
+    - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: healthLabel
+      value: 
+      objectReference: {fileID: 822088976}
     - target: {fileID: 9098655313535542192, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: spawner
       value: 
