@@ -214,17 +214,17 @@ MonoBehaviour:
     m_Bits: 8
   dropRaycastAbove: 3
   dropRaycastBelow: 10
-  knockbackMaxHorizontalSpeed: 18
+  knockbackMaxHorizontalSpeed: 36
   knockbackMaxUpSpeed: 18
   pathUpdateInterval: 0.4
   waypointReachDistance: 1.5
   navMeshHeightOffset: 0.5
-  steerGain: 10
+  steerGain: 8
   lateralDamping: 8
   brakingDistance: 2.5
   minApproachSpeed: 1.5
-  minAccel: 4
-  maxAccel: 18
+  minAccel: 6
+  maxAccel: 14
   groundProbeMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -232,12 +232,12 @@ MonoBehaviour:
   groundProbeDown: 1.25
   airborneVerticalVelThreshold: 0.05
   jumpInterval: 2.5
-  jumpForce: 22
+  jumpForce: 20
   maxJumpUpComponent: 0.4
   minJumpUpComponent: 0.12
-  closeJumpDistance: 1.25
+  closeJumpDistance: 1.1
   closeMaxJumpUpComponent: 0.22
-  maxJumpUpSpeed: 6
+  maxJumpUpSpeed: 8
 --- !u!114 &9223322008830706856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,8 +368,8 @@ MonoBehaviour:
   sourceRb: {fileID: 8792215854897121314}
   radius: 0.5
   groundNormalSource: {fileID: 0}
-  spinMultiplier: 3.4
-  rotationSmoothing: 20
+  spinMultiplier: 5
+  rotationSmoothing: 15
   autoDetectRadius: 1
   radiusSource: {fileID: 1585417079185973464}
   keepUpright: 0
