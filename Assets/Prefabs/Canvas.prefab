@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 110.33661}
+  m_AnchoredPosition: {x: 0, y: 17.6}
   m_SizeDelta: {x: 162.5442, y: 28.401093}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7238904378009309674
@@ -92,8 +92,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -170,7 +170,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -172, y: -47}
+  m_AnchoredPosition: {x: -54.4, y: -44}
   m_SizeDelta: {x: 325.2189, y: 81.3065}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4105274344853966065
@@ -228,8 +228,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 79
-  m_fontSizeBase: 79
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -283,6 +283,7 @@ GameObject:
   - component: {fileID: 4948213782484802710}
   - component: {fileID: 3420512220902115061}
   - component: {fileID: 2072485360250374934}
+  - component: {fileID: 4026045435051183298}
   m_Layer: 5
   m_Name: SPEED
   m_TagString: Untagged
@@ -306,7 +307,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 161, y: 54}
+  m_AnchoredPosition: {x: 161, y: -15.9}
   m_SizeDelta: {x: 314.7253, y: 99.602295}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3420512220902115061
@@ -365,8 +366,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 79
-  m_fontSizeBase: 79
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -409,6 +410,25 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &4026045435051183298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1309004648222040557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1d83e512251bd94f85297a647dde77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpeedTrackerUI
+  targetRb: {fileID: 0}
+  speedText: {fileID: 2072485360250374934}
+  speedBar: {fileID: 0}
+  horizontalOnly: 0
+  useKilometersPerHour: 0
+  maxSpeedForBar: 12
+  smooth: 10
 --- !u!1 &2586339641384921786
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,7 +463,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 172, y: -54.4068}
+  m_AnchoredPosition: {x: 164.9, y: -49.8}
   m_SizeDelta: {x: 324.5586, y: 94.2521}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6976372412212096165
@@ -503,8 +523,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 79
-  m_fontSizeBase: 79
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -582,7 +602,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -67}
+  m_AnchoredPosition: {x: 0, y: -28.2}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5530191059337641138
@@ -640,8 +660,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -733,7 +753,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -121}
+  m_AnchoredPosition: {x: 0, y: -46.3}
   m_SizeDelta: {x: 1000, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2748513070786450486
@@ -791,8 +811,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -869,7 +889,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -160, y: 50}
+  m_AnchoredPosition: {x: -41.7, y: -14}
   m_SizeDelta: {x: 310.49, y: 91.43848}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2589398033599935539
@@ -929,8 +949,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 79
-  m_fontSizeBase: 79
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -985,8 +1005,6 @@ GameObject:
   - component: {fileID: 6782585686425133039}
   - component: {fileID: 2934592956224476837}
   - component: {fileID: 488761457028571493}
-  - component: {fileID: 4930770535088357691}
-  - component: {fileID: 2415591444074129090}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1013,6 +1031,7 @@ RectTransform:
   - {fileID: 2893281695753078340}
   - {fileID: 4911624320423782570}
   - {fileID: 6119667534319650563}
+  - {fileID: 2536248210521970029}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1055,7 +1074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -1083,38 +1102,51 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &4930770535088357691
+--- !u!1 &8236360924839981313
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2536248210521970029}
+  - component: {fileID: 6647159988746488948}
+  m_Layer: 0
+  m_Name: ScreenDotSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2536248210521970029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8236360924839981313}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -379.50708, y: -210.83727, z: 0.47685865}
+  m_LocalScale: {x: 0.46538687, y: 0.46538687, z: 0.46538687}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3581316754803674377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6647159988746488948
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6797276334112723373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1d83e512251bd94f85297a647dde77f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpeedTrackerUI
-  targetRb: {fileID: 0}
-  speedText: {fileID: 2072485360250374934}
-  speedBar: {fileID: 0}
-  horizontalOnly: 0
-  useKilometersPerHour: 0
-  maxSpeedForBar: 12
-  smooth: 10
---- !u!114 &2415591444074129090
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6797276334112723373}
+  m_GameObject: {fileID: 8236360924839981313}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 342103fe0e91f854a873f1e2ae176b0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScreenDotSpawner
   targetCanvas: {fileID: 6782585686425133039}
-  dotPrefab: {fileID: 5287735202835701848, guid: 603a69a017f8b5442a7a7dc3b9b48b0a, type: 3}
+  dotPrefab: {fileID: 2341419706925675546, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
   dotLifetime: 1
   reuseSingleDot: 1

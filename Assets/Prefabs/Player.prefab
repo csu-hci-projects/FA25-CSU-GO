@@ -3122,7 +3122,7 @@ MonoBehaviour:
   preserveAirSpeed: 1
   externalImpulseDecay: 6
   externalHorizontalClamp: 20
-  externalImpulseLockDuration: 2
+  externalImpulseLockDuration: 0.3
 --- !u!114 &4419222057944332917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3152,7 +3152,7 @@ MonoBehaviour:
   ammoLabel: {fileID: 0}
   ammoSlider: {fileID: 0}
   pickupSound: {fileID: 8300000, guid: 2368e5dee48b8bf40bd226205343b7e1, type: 3}
-  pickupVolume: 0.2
+  pickupVolume: 0.3
   dryFireSound: {fileID: 8300000, guid: 743ac9e4acb6ef4479ff9bae2fdde479, type: 3}
   dryFireVolume: 0.2
   playDryFireOnFailedCheck: 1

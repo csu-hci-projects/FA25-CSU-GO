@@ -239,14 +239,14 @@ MonoBehaviour:
   closeMaxJumpUpComponent: 0.22
   maxJumpUpSpeed: 8
   fuseLoopClip: {fileID: 8300000, guid: d94e9edefa09eaa4d902b69bb52c7683, type: 3}
-  fuseLoopVolume: 0.7
+  fuseLoopVolume: 1
   fuseMinDistance: 1.5
-  fuseMaxDistance: 60
+  fuseMaxDistance: 80
   fuseRolloffMode: 0
   explosionClips:
   - {fileID: 8300000, guid: 1b37565976f570c4fa9dd10ba95b3a20, type: 3}
   - {fileID: 8300000, guid: 427f53f11b2bb8e498b3393b19f1ad8a, type: 3}
-  explosionVolume: 0.25
+  explosionVolume: 0.6
   explosionMaxDistance: 60
   explosionRolloffMode: 0
 --- !u!114 &9223322008830706856
