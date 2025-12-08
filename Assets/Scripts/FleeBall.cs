@@ -10,11 +10,11 @@ public class FleeBall : MonoBehaviour
     [SerializeField] float fleeSearchRadius = 50f; // search radius for valid NavMesh points
     [SerializeField] float moveForce = 30f;
     [SerializeField] float maxSpeed = 10f;
-    [SerializeField] int searchSamples = 50; // number of random points to sample for farthest node
+    [SerializeField] int searchSamples = 8; // number of random points to sample for farthest node
     [SerializeField] float loseInterestTime = 2f; // seconds without line of sight before stopping
 
     [Header("NavMesh")]
-    [SerializeField] float pathUpdateInterval = 0.3f;
+    [SerializeField] float pathUpdateInterval = 0.8f;
     [SerializeField] float waypointReachDistance = 1.5f;
 
     [Header("Wander (post-LOS)")]
@@ -89,6 +89,7 @@ public class FleeBall : MonoBehaviour
     float wanderNextPickTime = 0f;
 
     NavMeshPath navPath;
+    NavMeshPath fleeTestPath; // Reusable path for flee point searches
     int currentCorner = 0;
     float nextPathUpdate = 0f;
 
@@ -103,6 +104,7 @@ public class FleeBall : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
         navPath = new NavMeshPath();
+        fleeTestPath = new NavMeshPath(); // Reuse this for flee point searches
 
         // Setup notifier
         notifier = GetComponent<SpawnedEntityNotifier>();
@@ -321,11 +323,11 @@ public class FleeBall : MonoBehaviour
             NavMeshHit hit;
             if (NavMesh.SamplePosition(samplePoint, out hit, fleeSearchRadius, NavMesh.AllAreas))
             {
-                // Check if we can reach this point via NavMesh path
-                NavMeshPath testPath = new NavMeshPath();
-                if (NavMesh.CalculatePath(rb.position, hit.position, NavMesh.AllAreas, testPath))
+                // Check if we can reach this point via NavMesh path - reuse path object
+                fleeTestPath.ClearCorners();
+                if (NavMesh.CalculatePath(rb.position, hit.position, NavMesh.AllAreas, fleeTestPath))
                 {
-                    if (testPath.status == NavMeshPathStatus.PathComplete)
+                    if (fleeTestPath.status == NavMeshPathStatus.PathComplete)
                     {
                         // Calculate distance from player to this point
                         float distFromPlayer = Vector3.Distance(hit.position, player.position);

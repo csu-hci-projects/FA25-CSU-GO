@@ -65,6 +65,10 @@ public class BallDustEffect : MonoBehaviour
         trailRenderer.emitting = false;
     }
 
+    // Throttle ground raycasts - don't need to do it every frame
+    float nextGroundCheck = 0f;
+    const float GROUND_CHECK_INTERVAL = 0.1f; // Check 10 times per second instead of every frame
+
     void Update()
     {
         if (rb == null || trailRenderer == null) return;
@@ -78,19 +82,24 @@ public class BallDustEffect : MonoBehaviour
         {
             trailRenderer.emitting = true;
             
-            // Update trail position to ground level
-            if (alignToGround)
+            // Update trail position to ground level - throttled to reduce raycast overhead
+            if (alignToGround && Time.time >= nextGroundCheck)
             {
+                nextGroundCheck = Time.time + GROUND_CHECK_INTERVAL;
                 Vector3 rayOrigin = transform.position + Vector3.up * raycastHeight;
                 if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, raycastDistance + raycastHeight, groundMask, QueryTriggerInteraction.Ignore))
                 {
                     lastGroundPos = hit.point + Vector3.up * groundOffset;
-                    trailRenderer.transform.position = lastGroundPos;
                 }
                 else
                 {
-                    trailRenderer.transform.localPosition = Vector3.zero;
+                    lastGroundPos = transform.position;
                 }
+            }
+            // Always update position using last known ground pos (smooth interpolation)
+            if (alignToGround)
+            {
+                trailRenderer.transform.position = lastGroundPos;
             }
         }
         else

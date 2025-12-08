@@ -7,26 +7,31 @@ public class CameraController : MonoBehaviour
 
     private Vector2 _mouseInput;
     private float _pitch; // up/down (x-axis rotation)
+    private float _yaw;   // left/right (y-axis rotation)
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
+        // Initialize from current rotation
+        Vector3 angles = transform.eulerAngles;
+        _yaw = angles.y;
+        _pitch = angles.x;
+        if (_pitch > 180f) _pitch -= 360f;
     }
 
-    private void Update()
+    // Use LateUpdate for camera rotation to run after physics interpolation
+    private void LateUpdate()
     {
-        // Yaw (left/right) around world up
-        transform.Rotate(Vector3.up, _mouseInput.x * _sensitivity * Time.deltaTime, Space.World);
-
-        // Pitch (up/down) with clamp
+        // Accumulate yaw and pitch from mouse input
+        // Use unscaled delta time for consistent feel regardless of frame rate
+        _yaw += _mouseInput.x * _sensitivity * Time.deltaTime;
         _pitch -= _mouseInput.y * _sensitivity * Time.deltaTime;
         _pitch = Mathf.Clamp(_pitch, -90f, 90f);
 
-        Vector3 e = transform.localEulerAngles;
-        e.x = _pitch;
-        e.z = 0f; // keep roll zeroed
-        transform.localEulerAngles = e;
+        // Apply rotation directly (no Rotate calls which can accumulate errors)
+        transform.localRotation = Quaternion.Euler(_pitch, _yaw, 0f);
     }
 
     // Hook this to an Input Action (Vector2) for mouse delta

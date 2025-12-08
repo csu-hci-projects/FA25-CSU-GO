@@ -109,6 +109,7 @@ public class EnemyBall : MonoBehaviour
 
     Rigidbody rb;
     Transform player;
+    Rigidbody playerRb; // Cached player rigidbody
     bool hasAggro = false;
     bool exploded = false;
     SpawnedEntityNotifier notifier;
@@ -180,6 +181,7 @@ public class EnemyBall : MonoBehaviour
         if (playerObj != null)
         {
             player = playerObj.transform;
+            playerRb = playerObj.GetComponent<Rigidbody>(); // Cache once
         }
 
         fuseElapsed = 0f;
@@ -354,14 +356,10 @@ public class EnemyBall : MonoBehaviour
 
         // Ensure we at least match player's horizontal speed (so we can catch up)
         float playerHorizSpeed = 0f;
-        if (player != null)
+        if (playerRb != null)
         {
-            var prb = player.GetComponent<Rigidbody>();
-            if (prb != null)
-            {
-                Vector3 pv = prb.linearVelocity;
-                playerHorizSpeed = new Vector3(pv.x, 0f, pv.z).magnitude;
-            }
+            Vector3 pv = playerRb.linearVelocity;
+            playerHorizSpeed = new Vector3(pv.x, 0f, pv.z).magnitude;
         }
         desiredSpeed = Mathf.Max(desiredSpeed, playerHorizSpeed);
 

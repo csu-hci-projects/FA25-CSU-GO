@@ -10,7 +10,8 @@ public class PlayerRotate : MonoBehaviour
         mainCamera = Camera.main;
     }
 
-    private void Update()
+    // Use LateUpdate to run after camera has been positioned
+    private void LateUpdate()
     {
         // Rotate the player towards the camera every frame
         RotatePlayerTowardsCamera();
@@ -23,7 +24,7 @@ public class PlayerRotate : MonoBehaviour
             Vector3 cameraForward = mainCamera.transform.forward;
             cameraForward.y = 0f; // Ignore the y-axis rotation
 
-            if (cameraForward != Vector3.zero)
+            if (cameraForward.sqrMagnitude > 0.001f)
             {
                 Quaternion newRotation = Quaternion.LookRotation(cameraForward);
                 transform.rotation = newRotation;

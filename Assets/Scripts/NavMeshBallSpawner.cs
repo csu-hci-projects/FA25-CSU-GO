@@ -54,7 +54,7 @@ public class NavMeshBallSpawner : MonoBehaviour
 
     [Header("Counter Health")]
     [Tooltip("Periodically recount live entities to correct counters if some deaths don't fire events.")]
-    [SerializeField] float recountInterval = 1.0f;
+    [SerializeField] float recountInterval = 5.0f; // Increased from 1.0 to reduce FindObjectsByType calls
     float nextRecountTime = 0f;
 
     // Tracking currently alive instances

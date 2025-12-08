@@ -171,9 +171,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 2
+  m_CollisionDetection: 1
 --- !u!114 &1295368310099734065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -203,8 +203,8 @@ MonoBehaviour:
   wanderMaxSpeed: 17
   wanderReachDistance: 1
   explosionPrefab: {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
-  explosionFxLifetime: 3
-  explosionScale: 1
+  explosionFxLifetime: 4
+  explosionScale: 0.9
   fuseLoopClip: {fileID: 0}
   fuseLoopVolume: 0.7
   fuseMinDistance: 2
@@ -213,9 +213,9 @@ MonoBehaviour:
   explosionClips:
   - {fileID: 8300000, guid: 427f53f11b2bb8e498b3393b19f1ad8a, type: 3}
   - {fileID: 8300000, guid: 1b37565976f570c4fa9dd10ba95b3a20, type: 3}
-  explosionVolume: 0.25
+  explosionVolume: 0.5
   explosionMaxDistance: 60
-  explosionRolloffMode: 0
+  explosionRolloffMode: 1
   deactivatedMaterial: {fileID: 2100000, guid: b242c006026397d4d845f834bc054911, type: 2}
   healthDropPrefab: {fileID: 6781029310454996017, guid: 1736b9dc756b51141a7f3fbe6d5c8ecf, type: 3}
   healthDropSpawnOffset: {x: 0, y: 1.7, z: 0}

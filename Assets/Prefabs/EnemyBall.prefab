@@ -171,9 +171,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 2
+  m_CollisionDetection: 1
 --- !u!114 &454724163837572689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,8 +194,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   explosionPrefab: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
-  explosionFxLifetime: 5
-  explosionScale: 1.6
+  explosionFxLifetime: 2
+  explosionScale: 1
   explosionForce: 2
   explosionUpBoost: 2
   explosionRadius: 2.1
@@ -242,13 +242,13 @@ MonoBehaviour:
   fuseLoopVolume: 1
   fuseMinDistance: 1.5
   fuseMaxDistance: 80
-  fuseRolloffMode: 0
+  fuseRolloffMode: 1
   explosionClips:
   - {fileID: 8300000, guid: 1b37565976f570c4fa9dd10ba95b3a20, type: 3}
   - {fileID: 8300000, guid: 427f53f11b2bb8e498b3393b19f1ad8a, type: 3}
-  explosionVolume: 0.6
+  explosionVolume: 0.5
   explosionMaxDistance: 60
-  explosionRolloffMode: 0
+  explosionRolloffMode: 1
 --- !u!114 &9223322008830706856
 MonoBehaviour:
   m_ObjectHideFlags: 0

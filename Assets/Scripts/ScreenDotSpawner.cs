@@ -55,15 +55,28 @@ public class ScreenDotSpawner : MonoBehaviour
 
         RectTransform canvasRect = targetCanvas.transform as RectTransform;
 
+        // Convert world position to screen position using the gameplay camera
+        // Camera.WorldToScreenPoint returns (screenX, screenY, distanceFromCamera)
+        Vector3 screenPos3D = cam.WorldToScreenPoint(worldPos);
+        
+        // If the point is behind the camera, don't show the dot
+        if (screenPos3D.z < 0f)
+        {
+            if (reuseSingleDot && singleDot != null)
+                singleDot.gameObject.SetActive(false);
+            return;
+        }
+        
+        Vector2 screenPoint = new Vector2(screenPos3D.x, screenPos3D.y);
+        
+        // For ScreenPointToLocalPointInRectangle, pass null for Overlay canvas, 
+        // or the canvas camera for ScreenSpaceCamera mode
         Camera canvasCamera = null;
         if (targetCanvas.renderMode == RenderMode.ScreenSpaceCamera)
         {
-            canvasCamera = targetCanvas.worldCamera != null ? targetCanvas.worldCamera : cam;
+            canvasCamera = targetCanvas.worldCamera;
         }
-        // Use the same camera for both conversions. In builds the UI may render with a different
-        // camera/FOV than the gameplay camera; mixing them causes a horizontal offset.
-        Camera screenPointCamera = canvasCamera != null ? canvasCamera : cam;
-        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(screenPointCamera, worldPos);
+        // Note: For ScreenSpaceOverlay, canvasCamera should be null
         
         Vector2 localPoint;
         bool ok = RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, canvasCamera, out localPoint);

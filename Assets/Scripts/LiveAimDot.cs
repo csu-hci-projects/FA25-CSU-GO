@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Attach this to the player/gun and assign a ScreenDotSpawner. It will cast the same ray the shooter uses
@@ -35,6 +36,11 @@ public class LiveAimDot : MonoBehaviour
     [Tooltip("Color when aiming at an EnemyBall.")]
     public Color enemyBallColor = Color.red;
 
+    // Cache for component lookups to avoid GetComponentInParent every frame
+    private Collider lastHitCollider;
+    private bool lastWasFleeBall;
+    private bool lastWasEnemyBall;
+
     void Update()
     {
         if (spawner == null) return;
@@ -53,21 +59,33 @@ public class LiveAimDot : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxRange, hitMask, QueryTriggerInteraction.Ignore))
         {
-            // Determine the color based on what we hit
+            // Determine the color based on what we hit - use caching to avoid GetComponentInParent every frame
             Color dotColor = defaultColor;
             
-            var fleeBall = hit.collider.GetComponentInParent<FleeBall>();
-            if (fleeBall != null)
+            // Only do component lookup if we hit a different collider
+            if (hit.collider != lastHitCollider)
+            {
+                lastHitCollider = hit.collider;
+                var fleeBall = hit.collider.GetComponentInParent<FleeBall>();
+                lastWasFleeBall = fleeBall != null;
+                if (!lastWasFleeBall)
+                {
+                    var enemyBall = hit.collider.GetComponentInParent<EnemyBall>();
+                    lastWasEnemyBall = enemyBall != null;
+                }
+                else
+                {
+                    lastWasEnemyBall = false;
+                }
+            }
+            
+            if (lastWasFleeBall)
             {
                 dotColor = fleeBallColor;
             }
-            else
+            else if (lastWasEnemyBall)
             {
-                var enemyBall = hit.collider.GetComponentInParent<EnemyBall>();
-                if (enemyBall != null)
-                {
-                    dotColor = enemyBallColor;
-                }
+                dotColor = enemyBallColor;
             }
             
             spawner.SetDotColor(dotColor);
@@ -75,6 +93,11 @@ public class LiveAimDot : MonoBehaviour
         }
         else
         {
+            // Clear cache when not hitting anything
+            lastHitCollider = null;
+            lastWasFleeBall = false;
+            lastWasEnemyBall = false;
+            
             if (showAtMaxRange)
             {
                 spawner.SetDotColor(defaultColor);

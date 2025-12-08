@@ -167,7 +167,7 @@ MonoBehaviour:
     Enabled: 0
     m_Value: 0
   OutputChannel: 1
-  StandbyUpdate: 2
+  StandbyUpdate: 1
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
@@ -854,6 +854,7 @@ Transform:
   m_Children:
   - {fileID: 4126921221401237003}
   - {fileID: 1973028971032053693}
+  - {fileID: 7635618390007358071}
   - {fileID: 8012617594830533399}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
@@ -2835,7 +2836,7 @@ MonoBehaviour:
   IgnoreTimeScale: 0
   WorldUpOverride: {fileID: 0}
   ChannelMask: -1
-  UpdateMethod: 2
+  UpdateMethod: 1
   BlendUpdateMethod: 1
   LensModeOverride:
     Enabled: 0
@@ -3152,9 +3153,9 @@ MonoBehaviour:
   ammoLabel: {fileID: 0}
   ammoSlider: {fileID: 0}
   pickupSound: {fileID: 8300000, guid: 2368e5dee48b8bf40bd226205343b7e1, type: 3}
-  pickupVolume: 0.3
+  pickupVolume: 0.7
   dryFireSound: {fileID: 8300000, guid: 743ac9e4acb6ef4479ff9bae2fdde479, type: 3}
-  dryFireVolume: 0.2
+  dryFireVolume: 0.4
   playDryFireOnFailedCheck: 1
 --- !u!114 &5978209100862542608
 MonoBehaviour:
@@ -3175,9 +3176,9 @@ MonoBehaviour:
   gameOverSceneAsset: {fileID: 102900000, guid: 8ad5b74c52851439aa85329e34d52c1a, type: 3}
   deathDelay: 0.5
   damageSound: {fileID: 8300000, guid: 4c3a23e45dade52428f9a2b2d485afa6, type: 3}
-  damageVolume: 0.3
+  damageVolume: 0.7
   healSound: {fileID: 8300000, guid: 28743cd9e43a4584dbb539b224ea4110, type: 3}
-  healVolume: 0.6
+  healVolume: 0.7
   deathSound: {fileID: 8300000, guid: 4edb352a036d65149becc9a181c79734, type: 3}
   deathVolume: 0.7
 --- !u!1 &7155658872154737126
@@ -3304,7 +3305,7 @@ GameObject:
   - component: {fileID: 4959921880873479994}
   - component: {fileID: 9123228050440538714}
   - component: {fileID: 4768917740418998635}
-  - component: {fileID: 9098655313535542192}
+  - component: {fileID: 989772503412143241}
   m_Layer: 7
   m_Name: WeaponRoot
   m_TagString: Untagged
@@ -3471,7 +3472,7 @@ MonoBehaviour:
   posStep: 0.0015
   rotStep: 0.2
   aimKey: 324
---- !u!114 &9098655313535542192
+--- !u!114 &989772503412143241
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3480,20 +3481,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 7589540688589918666}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2ca42f3e84680b42952d746ebeea907, type: 3}
+  m_Script: {fileID: 11500000, guid: dc955f81308027f469c5d44a933113f9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LiveAimDot
-  spawner: {fileID: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::WorldSpaceAimDot
+  dotTransform: {fileID: 7635618390007358071}
   muzzle: {fileID: 2868224210781979091}
-  shootCamera: {fileID: 3984145171397742502}
+  shootCamera: {fileID: 3184943929317994336}
   maxRange: 200
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  showAtMaxRange: 1
+  surfaceOffset: 0.05
+  dotScreenSize: 4
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
-  fleeBallColor: {r: 1, g: 0.92156863, b: 0, a: 1}
-  enemyBallColor: {r: 1, g: 0.92156863, b: 0, a: 1}
+  fleeBallColor: {r: 1, g: 0, b: 0, a: 1}
+  enemyBallColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &7660517838916627066
 GameObject:
   m_ObjectHideFlags: 0
@@ -3909,3 +3911,65 @@ Transform:
   - {fileID: 8853722548400600322}
   m_Father: {fileID: 7107262038088397348}
   m_LocalEulerAnglesHint: {x: -4.268, y: -1.581, z: 28.564}
+--- !u!1001 &6118579807733232757
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3095174120971164891}
+    m_Modifications:
+    - target: {fileID: 4215624813028062875, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_Name
+      value: Dot
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.2014298
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.1616745
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+--- !u!4 &7635618390007358071 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4404139534531761666, guid: d7dd9f2c9a0d97b4184c3f401d349d22, type: 3}
+  m_PrefabInstance: {fileID: 6118579807733232757}
+  m_PrefabAsset: {fileID: 0}
