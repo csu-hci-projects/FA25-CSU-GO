@@ -125,6 +125,29 @@ public class EnemyBall : MonoBehaviour
     // Global tracking for active drops
     static System.Collections.Generic.List<GameObject> s_activeDrops;
 
+    [Header("Audio (Fuse Loop)")]
+    [Tooltip("Looping audio clip to play while the fuse is active")] 
+    [SerializeField] AudioClip fuseLoopClip;
+    [Tooltip("Volume of the fuse loop")] 
+    [SerializeField] [Range(0f,1f)] float fuseLoopVolume = 0.7f;
+    [Tooltip("Distance at which the fuse sound is at full volume")] 
+    [SerializeField] float fuseMinDistance = 2f;
+    [Tooltip("Max distance at which the fuse sound can be heard")] 
+    [SerializeField] float fuseMaxDistance = 18f;
+    [Tooltip("Rolloff mode for 3D fuse sound attenuation")] 
+    [SerializeField] AudioRolloffMode fuseRolloffMode = AudioRolloffMode.Linear;
+    AudioSource fuseAudioSource;
+
+    [Header("Audio (Explosion)")]
+    [Tooltip("One-shot audio clips to randomly play when the enemy explodes")] 
+    [SerializeField] AudioClip[] explosionClips;
+    [Tooltip("Volume of the explosion sound")] 
+    [SerializeField] [Range(0f,1f)] float explosionVolume = 1f;
+    [Tooltip("Max distance at which the explosion sound can be heard")] 
+    [SerializeField] float explosionMaxDistance = 35f;
+    [Tooltip("Rolloff mode for explosion sound attenuation")] 
+    [SerializeField] AudioRolloffMode explosionRolloffMode = AudioRolloffMode.Linear;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -164,6 +187,21 @@ public class EnemyBall : MonoBehaviour
         if (fuseActive)
         {
             UpdateFuseColor(0f);
+            // Start fuse loop sound if provided
+            EnsureFuseAudio();
+            if (fuseAudioSource != null && fuseLoopClip != null)
+            {
+                fuseAudioSource.clip = fuseLoopClip;
+                fuseAudioSource.volume = fuseLoopVolume;
+                fuseAudioSource.loop = true;
+                fuseAudioSource.playOnAwake = false;
+                fuseAudioSource.spatialBlend = 1f; // 3D
+                fuseAudioSource.minDistance = Mathf.Max(0.01f, fuseMinDistance);
+                fuseAudioSource.maxDistance = Mathf.Max(fuseAudioSource.minDistance, fuseMaxDistance);
+                fuseAudioSource.rolloffMode = fuseRolloffMode;
+                fuseAudioSource.Stop();
+                fuseAudioSource.Play();
+            }
         }
     }
 
@@ -261,6 +299,18 @@ public class EnemyBall : MonoBehaviour
             fuseActive = false;
             // Fuse timeout explosion: route through TriggerExplosion with explicit cause
             TriggerExplosion(false, ExplosionCause.Fuse);
+        }
+    }
+
+    void EnsureFuseAudio()
+    {
+        if (fuseAudioSource == null)
+        {
+            fuseAudioSource = GetComponent<AudioSource>();
+            if (fuseAudioSource == null)
+            {
+                fuseAudioSource = gameObject.AddComponent<AudioSource>();
+            }
         }
     }
 
@@ -494,6 +544,15 @@ public class EnemyBall : MonoBehaviour
         if (exploded) return;
         exploded = true;
 
+        // Stop fuse loop sound
+        if (fuseAudioSource != null && fuseAudioSource.isPlaying)
+        {
+            fuseAudioSource.Stop();
+        }
+
+        // Play explosion one-shot sound
+        PlayExplosionSound();
+
         // Spawn FX
         if (explosionPrefab != null)
         {
@@ -540,6 +599,14 @@ public class EnemyBall : MonoBehaviour
     {
         if (exploded) return;
         exploded = true;
+
+        if (fuseAudioSource != null && fuseAudioSource.isPlaying)
+        {
+            fuseAudioSource.Stop();
+        }
+
+        // Play explosion one-shot sound
+        PlayExplosionSound();
 
         if (explosionPrefab != null)
         {
@@ -764,5 +831,41 @@ public class EnemyBall : MonoBehaviour
                 Gizmos.DrawLine(navPath.corners[i], navPath.corners[i + 1]);
             }
         }
+    }
+
+    void OnDisable()
+    {
+        // Ensure audio loop is stopped if object gets disabled/destroyed
+        if (fuseAudioSource != null)
+        {
+            fuseAudioSource.Stop();
+        }
+    }
+
+    void PlayExplosionSound()
+    {
+        // Pick a random clip from the list
+        AudioClip clip = null;
+        if (explosionClips != null && explosionClips.Length > 0)
+        {
+            int idx = Random.Range(0, explosionClips.Length);
+            clip = explosionClips[idx];
+        }
+        if (clip == null) return;
+        // Create a separate temporary GameObject so audio survives enemy destruction
+        var go = new GameObject("ExplosionAudio");
+        go.transform.position = transform.position;
+        var src = go.AddComponent<AudioSource>();
+        src.clip = clip;
+        src.volume = explosionVolume;
+        src.spatialBlend = 1f; // 3D
+        src.minDistance = 1f;
+        src.maxDistance = Mathf.Max(1f, explosionMaxDistance);
+        src.rolloffMode = explosionRolloffMode;
+        src.playOnAwake = false;
+        src.loop = false;
+        src.Stop();
+        src.Play();
+        Destroy(go, clip.length + 0.1f);
     }
 }

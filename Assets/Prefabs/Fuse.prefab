@@ -14992,7 +14992,7 @@ MonoBehaviour:
   pickupEffectPrefab: {fileID: 141433446842962269, guid: 9fe8f8b3288e45a44af36ff8aa04486e, type: 3}
   effectScale: 1
   effectLifetime: 2
-  pickupSound: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: 8057b293a54d1174eab9c081fb066d27, type: 3}
   soundVolume: 1
 --- !u!1 &8002972192193171060
 GameObject:

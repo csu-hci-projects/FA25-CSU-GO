@@ -477,11 +477,11 @@ PrefabInstance:
       objectReference: {fileID: 2064382654}
     - target: {fileID: 4948213782484802710, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 170
+      value: 162
       objectReference: {fileID: 0}
     - target: {fileID: 4948213782484802710, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -910
+      value: 57
       objectReference: {fileID: 0}
     - target: {fileID: 6797276334112723373, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_Name
@@ -509,7 +509,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7603826701340434125, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1573
+      value: -157
       objectReference: {fileID: 0}
     - target: {fileID: 8756377302436399730, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_SizeDelta.x
@@ -2223,6 +2223,7 @@ MonoBehaviour:
   spawnOffset: {x: 0, y: 1, z: 0}
   infiniteSpawning: 1
   spawnInterval: 7
+  spawnCooldown: 0.5
   recountInterval: 1
 --- !u!1 &1937022176
 GameObject:

@@ -21,6 +21,8 @@ public class AmmoSystem : MonoBehaviour
     [Range(0f,1f)] [SerializeField] float pickupVolume = 1f;
     [SerializeField] AudioClip dryFireSound;
     [Range(0f,1f)] [SerializeField] float dryFireVolume = 1f;
+    [Tooltip("If true, play dry-fire sound when a consume check fails (e.g., player clicks while empty)")]
+    [SerializeField] bool playDryFireOnFailedCheck = true;
 
     public int CurrentAmmo { get; private set; }
     public int MaxAmmo => maxAmmo;
@@ -35,7 +37,12 @@ public class AmmoSystem : MonoBehaviour
     public bool CanConsume(int amount)
     {
         if (amount <= 0) return false;
-        return CurrentAmmo >= amount;
+        bool ok = CurrentAmmo >= amount;
+        if (!ok && playDryFireOnFailedCheck && dryFireSound)
+        {
+            AudioSource.PlayClipAtPoint(dryFireSound, transform.position, dryFireVolume);
+        }
+        return ok;
     }
 
     public void Consume(int amount)
@@ -43,7 +50,12 @@ public class AmmoSystem : MonoBehaviour
         if (amount <= 0) return;
         CurrentAmmo = Mathf.Clamp(CurrentAmmo - amount, 0, maxAmmo);
         UpdateUI();
-        if (CurrentAmmo == 0 && dryFireSound)
+        // Do not auto-play dry fire here; it's handled on failed checks
+    }
+
+    public void PlayDryFire()
+    {
+        if (dryFireSound)
         {
             AudioSource.PlayClipAtPoint(dryFireSound, transform.position, dryFireVolume);
         }

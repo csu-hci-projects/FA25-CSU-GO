@@ -780,25 +780,97 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3184943929317994336, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: near clip plane
+      value: 0.03
+      objectReference: {fileID: 0}
     - target: {fileID: 3777963179729519173, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: ammoLabel
       value: 
       objectReference: {fileID: 1175454681}
+    - target: {fileID: 3777963179729519173, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: pickupSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 2368e5dee48b8bf40bd226205343b7e1, type: 3}
+    - target: {fileID: 3777963179729519173, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: dryFireSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 743ac9e4acb6ef4479ff9bae2fdde479, type: 3}
+    - target: {fileID: 3777963179729519173, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: pickupVolume
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3777963179729519173, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: dryFireVolume
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 3908231648173701891, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: healthLabel
       value: 
       objectReference: {fileID: 822088976}
+    - target: {fileID: 4451801684320042284, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: jumpVolume
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4451801684320042284, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: landingVolume
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 4451801684320042284, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: landingClips.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4451801684320042284, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: 'landingClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 6eef4c25dc3b7fc41bee4fabfcc5bff0, type: 3}
+    - target: {fileID: 4451801684320042284, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: 'landingClips.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: c29cd8073e49fcb479a0b8a266662372, type: 3}
     - target: {fileID: 4959921880873479994, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: screenDotSpawner
       value: 
       objectReference: {fileID: 6656145241279594898}
+    - target: {fileID: 5070435722480868682, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: TiltAxis.Range.x
+      value: -87
+      objectReference: {fileID: 0}
+    - target: {fileID: 5070435722480868682, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: TiltAxis.Range.y
+      value: 87
+      objectReference: {fileID: 0}
+    - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: healSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 28743cd9e43a4584dbb539b224ea4110, type: 3}
+    - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: deathSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 4edb352a036d65149becc9a181c79734, type: 3}
+    - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: healVolume
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: damageSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 4c3a23e45dade52428f9a2b2d485afa6, type: 3}
+    - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: deathVolume
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: healthLabel
       value: 
       objectReference: {fileID: 822088976}
     - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
+      propertyPath: damageVolume
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5978209100862542608, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: gameOverSceneName
-      value: Title Screen
+      value: TitleScreen
       objectReference: {fileID: 0}
     - target: {fileID: 9098655313535542192, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: spawner
@@ -1170,6 +1242,7 @@ MonoBehaviour:
   spawnOffset: {x: 0, y: 1, z: 0}
   infiniteSpawning: 1
   spawnInterval: 7
+  spawnCooldown: 0.5
   recountInterval: 1
 --- !u!4 &727633983 stripped
 Transform:

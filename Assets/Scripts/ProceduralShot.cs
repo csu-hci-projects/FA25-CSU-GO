@@ -48,6 +48,16 @@ public class FpsGunShootAnim : MonoBehaviour
     [Tooltip("Points awarded when hitting a generic damageable (if you want per-hit score).")]
     public int damageHitPoints = 10;
 
+    [Header("Audio (Gunshot)")]
+    [Tooltip("Gunshot audio clips to randomly play when firing")]
+    public AudioClip[] gunshotClips;
+    [Tooltip("Volume of the gunshot sound")]
+    [Range(0f,1f)] public float gunshotVolume = 1f;
+    [Tooltip("Max distance at which the gunshot sound can be heard")]
+    public float gunshotMaxDistance = 50f;
+    [Tooltip("Rolloff mode for gunshot sound attenuation")]
+    public AudioRolloffMode gunshotRolloffMode = AudioRolloffMode.Logarithmic;
+
     [HideInInspector] public float aimWeight = 0f; // 0..1, set by AdsController
     [Header("Aim tuning")]
     [Range(0f,1f)]
@@ -272,6 +282,9 @@ public class FpsGunShootAnim : MonoBehaviour
 
     public void Fire()
     {
+        // Play gunshot sound
+        PlayGunshotSound();
+
         if (useSlide && slide) { slidePlaying = true; slideT = 0f; }
 
         // recoil impulse (affects WHOLE arms now)
@@ -466,5 +479,35 @@ public class FpsGunShootAnim : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    void PlayGunshotSound()
+    {
+        AudioClip clip = null;
+        if (gunshotClips != null && gunshotClips.Length > 0)
+        {
+            int idx = Random.Range(0, gunshotClips.Length);
+            clip = gunshotClips[idx];
+        }
+        if (clip == null) return;
+        
+        // Use muzzle position if available, otherwise use this transform
+        Vector3 soundPos = muzzle != null ? muzzle.position : transform.position;
+        
+        // Create temporary AudioSource for 3D positioned gunshot
+        var go = new GameObject("GunshotAudio");
+        go.transform.position = soundPos;
+        var src = go.AddComponent<AudioSource>();
+        src.clip = clip;
+        src.volume = gunshotVolume;
+        src.spatialBlend = 1f; // 3D
+        src.minDistance = 1f;
+        src.maxDistance = Mathf.Max(1f, gunshotMaxDistance);
+        src.rolloffMode = gunshotRolloffMode;
+        src.playOnAwake = false;
+        src.loop = false;
+        src.Stop();
+        src.Play();
+        Destroy(go, clip.length + 0.1f);
     }
 }

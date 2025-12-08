@@ -20,6 +20,14 @@ public class PlayerHealth : MonoBehaviour
 #endif
     [SerializeField] float deathDelay = 0.5f;
 
+    [Header("Audio (Optional)")]
+    [SerializeField] AudioClip damageSound;
+    [Range(0f,1f)] [SerializeField] float damageVolume = 1f;
+    [SerializeField] AudioClip healSound;
+    [Range(0f,1f)] [SerializeField] float healVolume = 1f;
+    [SerializeField] AudioClip deathSound;
+    [Range(0f,1f)] [SerializeField] float deathVolume = 1f;
+
     bool isDead = false;
 
     void Awake()
@@ -36,6 +44,13 @@ public class PlayerHealth : MonoBehaviour
         if (amount <= 0) return;
         currentHealth = Mathf.Clamp(currentHealth - amount, 0, MaxHealth);
         UpdateUI();
+        
+        // Play damage sound
+        if (damageSound)
+        {
+            AudioSource.PlayClipAtPoint(damageSound, transform.position, damageVolume);
+        }
+        
         if (currentHealth <= 0)
         {
             HandleDeath();
@@ -47,6 +62,12 @@ public class PlayerHealth : MonoBehaviour
         if (amount <= 0) return;
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, MaxHealth);
         UpdateUI();
+        
+        // Play heal sound
+        if (healSound)
+        {
+            AudioSource.PlayClipAtPoint(healSound, transform.position, healVolume);
+        }
     }
 
     void UpdateUI()
@@ -59,6 +80,13 @@ public class PlayerHealth : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+        
+        // Play death sound
+        if (deathSound)
+        {
+            AudioSource.PlayClipAtPoint(deathSound, transform.position, deathVolume);
+        }
+        
         if (deathDelay > 0f)
         {
             Invoke(nameof(LoadGameOverScene), deathDelay);

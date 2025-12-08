@@ -48,6 +48,20 @@ public class PlayerMovementFPSBhop : MonoBehaviour
     [Tooltip("Grace period after landing before clamping to base speed (seconds).")]
     public float clampGracePeriod = 0.3f;
 
+    [Header("Audio (Jump & Landing)")]
+    [Tooltip("Jump audio clips to randomly play when jumping")]
+    public AudioClip[] jumpClips;
+    [Tooltip("Volume of the jump sound")]
+    [Range(0f,1f)] public float jumpVolume = 1f;
+    [Tooltip("Landing audio clips to randomly play when landing")]
+    public AudioClip[] landingClips;
+    [Tooltip("Volume of the landing sound")]
+    [Range(0f,1f)] public float landingVolume = 1f;
+    [Tooltip("Max distance at which jump/landing sounds can be heard")]
+    public float audioMaxDistance = 20f;
+    [Tooltip("Rolloff mode for jump/landing sound attenuation")]
+    public AudioRolloffMode audioRolloffMode = AudioRolloffMode.Logarithmic;
+
     [Header("Air Control (CS-like)")]
     [Tooltip("How quickly your horizontal velocity can rotate toward the wish direction while airborne (radians/sec). ~8–16 is strong, CS-like.")]
     public float airTurnRate = 12f;
@@ -76,17 +90,31 @@ public class PlayerMovementFPSBhop : MonoBehaviour
     private bool punishedThisLanding;
     private float bhopBonus; // current stacked bonus speed
 
+    // Audio debouncing
+    private float lastJumpSoundTime = -999f;
+    private float lastLandingSoundTime = -999f;
+    private const float SOUND_COOLDOWN = 0.1f; // minimum time between same sound type
+
     [Header("External Forces")]
     [Tooltip("Decay rate for externally applied impulses (per second, higher = fade faster).")]
     public float externalImpulseDecay = 6f;
     [Tooltip("Clamp for horizontal magnitude contributed by external impulses (optional, 0 = no clamp).")]
     public float externalHorizontalClamp = 0f;
     private Vector3 externalImpulse; // added to velocity each FixedUpdate, decays over time
+    private float externalLockUntil; // window where we avoid instant snap-up after big impulses
+    [Tooltip("Time window after external impulse where ground movement won't instantly boost speed (seconds)")]
+    public float externalImpulseLockDuration = 0.3f;
 
     // Allow other scripts (e.g., explosions) to add impulses that the movement system will respect
     public void ApplyExternalImpulse(Vector3 impulse)
     {
         externalImpulse += impulse;
+        // After significant impulse, lock ground snapping for a short duration
+        float horizMag = new Vector3(impulse.x, 0f, impulse.z).magnitude;
+        if (horizMag > 0.25f)
+        {
+            externalLockUntil = Time.time + externalImpulseLockDuration;
+        }
     }
 
     void Awake()
@@ -165,6 +193,9 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         {
             groundedSince = Time.time;
             punishedThisLanding = false;
+            
+            // Play landing sound
+            PlayLandingSound();
         }
         else if (!isGrounded && wasGrounded)
         {
@@ -197,7 +228,7 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         float extHorizMag = new Vector3(ext.x, 0f, ext.z).magnitude;
         bool hasSignificantExternalForce = extHorizMag > 0.5f;
 
-        // GROUNDED: snap to desired dir * speed (instant accel is OK on ground)
+        // GROUNDED: normally snap to desired dir * speed, but respect recent external impulses
         if (isGrounded && !hasSignificantExternalForce)
         {
             Vector3 targetXZ = wishDir * effectiveSpeed;
@@ -212,6 +243,7 @@ public class PlayerMovementFPSBhop : MonoBehaviour
                 RaycastHit obsHit;
                 bool blocked = Physics.Raycast(rayOrigin, wishDir, out obsHit, obstacleCheckDistance, obstacleMask, QueryTriggerInteraction.Ignore);
 
+                bool lockBoost = Time.time < externalLockUntil; // avoid instant boost after explosions
                 if (blocked)
                 {
                     Vector3 curHoriz = new Vector3(v.x, 0f, v.z);
@@ -224,8 +256,21 @@ public class PlayerMovementFPSBhop : MonoBehaviour
                 }
                 else
                 {
-                    v.x = targetXZ.x;
-                    v.z = targetXZ.z;
+                    if (lockBoost)
+                    {
+                        // Steer direction without increasing magnitude above current
+                        Vector3 curHoriz = new Vector3(v.x, 0f, v.z);
+                        float curMag = curHoriz.magnitude;
+                        float cappedMag = Mathf.Min(curMag, effectiveSpeed);
+                        Vector3 cappedTarget = wishDir * cappedMag;
+                        v.x = cappedTarget.x;
+                        v.z = cappedTarget.z;
+                    }
+                    else
+                    {
+                        v.x = targetXZ.x;
+                        v.z = targetXZ.z;
+                    }
                 }
             }
             else
@@ -282,11 +327,14 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         {
             bool withinWindow = (Time.time - lastJumpPressedTime) <= bhopWindow;
             bool movingEnough = desiredMoveDir.sqrMagnitude >= (bhopMinMove * bhopMinMove);
+            bool lockBoost = Time.time < externalLockUntil; // explosion/impulse recovery window
 
             if (withinWindow && movingEnough)
             {
                 // Successful bhop: stack bonus, clamp
-                bhopBonus = Mathf.Min(bhopBonus + bhopBonusPerHop, bhopMaxBonus);
+                // During external recovery, limit bonus so speed doesn't instantly restore
+                float bonusAdd = lockBoost ? (bhopBonusPerHop * 0.33f) : bhopBonusPerHop;
+                bhopBonus = Mathf.Min(bhopBonus + bonusAdd, bhopMaxBonus);
                 punishedThisLanding = true;
             }
             else
@@ -301,6 +349,23 @@ public class PlayerMovementFPSBhop : MonoBehaviour
             vel.y = 0f;
             rb.linearVelocity = vel;
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            
+            // Play jump sound
+            PlayJumpSound();
+
+            // During recovery, gently cap horizontal speed after jump so it's reduced but not erased
+            if (lockBoost)
+            {
+                Vector3 hv = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+                float curMag = hv.magnitude;
+                // Target cap is a blend toward base speed rather than full base snap
+                float cap = Mathf.Lerp(curMag, moveSpeed, 0.35f);
+                if (curMag > cap && cap > 0f)
+                {
+                    Vector3 capped = hv.normalized * cap;
+                    rb.linearVelocity = new Vector3(capped.x, rb.linearVelocity.y, capped.z);
+                }
+            }
         }
         jumpPressed = false;
 
@@ -344,7 +409,9 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         // If horizontal speed exceeds base speed, clamp it down
         Vector3 vel = rb.linearVelocity;
         Vector3 horiz = new Vector3(vel.x, 0f, vel.z);
-        if (horiz.magnitude > moveSpeed)
+        // Respect recent external impulses: only clamp if clearly above base and outside lock window
+        bool lockBoost = Time.time < externalLockUntil;
+        if (!lockBoost && horiz.magnitude > moveSpeed)
         {
             horiz = horiz.normalized * moveSpeed;
             rb.linearVelocity = new Vector3(horiz.x, vel.y, horiz.z);
@@ -361,4 +428,66 @@ public class PlayerMovementFPSBhop : MonoBehaviour
         }
     }
 #endif
+
+    void PlayJumpSound()
+    {
+        // Debounce: prevent multiple jump sounds in quick succession
+        if (Time.time - lastJumpSoundTime < SOUND_COOLDOWN) return;
+        lastJumpSoundTime = Time.time;
+        
+        AudioClip clip = null;
+        if (jumpClips != null && jumpClips.Length > 0)
+        {
+            int idx = Random.Range(0, jumpClips.Length);
+            clip = jumpClips[idx];
+        }
+        if (clip == null) return;
+        
+        // Create temporary AudioSource for 3D positioned audio
+        var go = new GameObject("JumpAudio");
+        go.transform.position = transform.position;
+        var src = go.AddComponent<AudioSource>();
+        src.clip = clip;
+        src.volume = jumpVolume;
+        src.spatialBlend = 1f; // 3D
+        src.minDistance = 1f;
+        src.maxDistance = Mathf.Max(1f, audioMaxDistance);
+        src.rolloffMode = audioRolloffMode;
+        src.playOnAwake = false;
+        src.loop = false;
+        src.Stop();
+        src.Play();
+        Destroy(go, clip.length + 0.1f);
+    }
+
+    void PlayLandingSound()
+    {
+        // Debounce: prevent multiple landing sounds in quick succession
+        if (Time.time - lastLandingSoundTime < SOUND_COOLDOWN) return;
+        lastLandingSoundTime = Time.time;
+        
+        AudioClip clip = null;
+        if (landingClips != null && landingClips.Length > 0)
+        {
+            int idx = Random.Range(0, landingClips.Length);
+            clip = landingClips[idx];
+        }
+        if (clip == null) return;
+        
+        // Create temporary AudioSource for 3D positioned audio
+        var go = new GameObject("LandingAudio");
+        go.transform.position = transform.position;
+        var src = go.AddComponent<AudioSource>();
+        src.clip = clip;
+        src.volume = landingVolume;
+        src.spatialBlend = 1f; // 3D
+        src.minDistance = 1f;
+        src.maxDistance = Mathf.Max(1f, audioMaxDistance);
+        src.rolloffMode = audioRolloffMode;
+        src.playOnAwake = false;
+        src.loop = false;
+        src.Stop();
+        src.Play();
+        Destroy(go, clip.length + 0.1f);
+    }
 }

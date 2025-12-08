@@ -48,6 +48,9 @@ public class NavMeshBallSpawner : MonoBehaviour
     [SerializeField] bool infiniteSpawning = false;
     [SerializeField] float spawnInterval = 10f;
     float nextSpawnTime = 0f;
+    [Tooltip("Minimum seconds between spawn attempts (prevents rapid retries)")]
+    [SerializeField] float spawnCooldown = 0.5f;
+    float lastSpawnAttemptTime = -999f;
 
     [Header("Counter Health")]
     [Tooltip("Periodically recount live entities to correct counters if some deaths don't fire events.")]
@@ -115,6 +118,9 @@ public class NavMeshBallSpawner : MonoBehaviour
     public void SpawnBalls()
     {
         if (player == null) return;
+        // Rate-limit spawn attempts to avoid repeated retries causing job churn
+        if (Time.time - lastSpawnAttemptTime < spawnCooldown) return;
+        lastSpawnAttemptTime = Time.time;
         // Ensure counts reflect current scene state before deciding room
         RecountAlive();
         // Determine how many to spawn now. In infinite mode, treat counts as batch sizes under caps.
@@ -304,7 +310,11 @@ public class NavMeshBallSpawner : MonoBehaviour
             }
             else
             {
-                Debug.Log("NavMeshBallSpawner: SamplePosition failed near target; ensure NavMesh is baked and sample radius is sufficient.");
+                // Throttle logging to avoid spamming the console
+                if (attempts == 1 || (attempts % 20) == 0)
+                {
+                    Debug.Log("NavMeshBallSpawner: SamplePosition failed near target; ensure NavMesh is baked and sample radius is sufficient.");
+                }
             }
         }
 

@@ -10087,7 +10087,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b99c62b2f35fca4b8cc296cab92577b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AmmoPickup
-  ammoAmount: 16
+  ammoAmount: 8
   pickupEffectPrefab: {fileID: 141433446842962269, guid: 9fe8f8b3288e45a44af36ff8aa04486e, type: 3}
   effectScale: 1
   effectLifetime: 2

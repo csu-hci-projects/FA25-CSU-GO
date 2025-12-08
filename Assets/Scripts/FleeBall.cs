@@ -40,6 +40,28 @@ public class FleeBall : MonoBehaviour
     [Tooltip("Scale multiplier for the explosion effect (1 = original size).")]
     [SerializeField] float explosionScale = 1f;
 
+    [Header("Audio (Fuse & Explosion)")]
+    [Tooltip("Looping audio clip to play while the ball is actively moving/fleeing")] 
+    [SerializeField] AudioClip fuseLoopClip;
+    [Tooltip("Volume of the fuse loop")] 
+    [SerializeField] [Range(0f,1f)] float fuseLoopVolume = 0.7f;
+    [Tooltip("Distance at which the fuse sound is at full volume")] 
+    [SerializeField] float fuseMinDistance = 2f;
+    [Tooltip("Max distance at which the fuse sound can be heard")] 
+    [SerializeField] float fuseMaxDistance = 18f;
+    [Tooltip("Rolloff mode for 3D fuse sound attenuation")] 
+    [SerializeField] AudioRolloffMode fuseRolloffMode = AudioRolloffMode.Linear;
+    AudioSource fuseAudioSource;
+
+    [Tooltip("One-shot audio clips to randomly play when the ball explodes")] 
+    [SerializeField] AudioClip[] explosionClips;
+    [Tooltip("Volume of the explosion sound")] 
+    [SerializeField] [Range(0f,1f)] float explosionVolume = 1f;
+    [Tooltip("Max distance at which the explosion sound can be heard")] 
+    [SerializeField] float explosionMaxDistance = 35f;
+    [Tooltip("Rolloff mode for explosion sound attenuation")] 
+    [SerializeField] AudioRolloffMode explosionRolloffMode = AudioRolloffMode.Linear;
+
     [Header("Deactivation (on catch)")]
     [Tooltip("Material to apply when ball is caught/deactivated. Leave null to keep original.")]
     [SerializeField] Material deactivatedMaterial;
@@ -86,6 +108,19 @@ public class FleeBall : MonoBehaviour
         notifier = GetComponent<SpawnedEntityNotifier>();
         if (notifier == null) notifier = gameObject.AddComponent<SpawnedEntityNotifier>();
         notifier.EntityType = SpawnedEntityNotifier.Type.Flee;
+
+        // Setup fuse audio source
+        fuseAudioSource = GetComponent<AudioSource>();
+        if (fuseAudioSource == null)
+        {
+            fuseAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+        fuseAudioSource.playOnAwake = false;
+        fuseAudioSource.loop = true;
+        fuseAudioSource.spatialBlend = 1f;
+        fuseAudioSource.rolloffMode = fuseRolloffMode;
+        fuseAudioSource.minDistance = Mathf.Max(0.01f, fuseMinDistance);
+        fuseAudioSource.maxDistance = Mathf.Max(fuseAudioSource.minDistance, fuseMaxDistance);
     }
 
     void Start()
@@ -111,6 +146,7 @@ public class FleeBall : MonoBehaviour
         {
             isFleeing = true;
             lastSeenTime = Time.time;
+            TryStartFuseLoop();
         }
 
         // Stop fleeing if player hasn't been seen for too long
@@ -119,6 +155,7 @@ public class FleeBall : MonoBehaviour
             if (Time.time - lastSeenTime > loseInterestTime)
             {
                 isFleeing = false;
+                StopFuseLoop();
                 // Prepare to start wandering after a short delay
                 if (enableWanderAfterLoseSight)
                 {
@@ -130,6 +167,7 @@ public class FleeBall : MonoBehaviour
         else if (isFleeing && hasLineOfSight)
         {
             lastSeenTime = Time.time;
+            TryStartFuseLoop();
         }
 
         if (!isFleeing)
@@ -155,6 +193,9 @@ public class FleeBall : MonoBehaviour
 
         // Apply force away from player
         rb.AddForce(targetDirection * moveForce, ForceMode.Acceleration);
+
+        // Ensure fuse loop is playing while actively moving
+        TryStartFuseLoop();
 
         // Clamp horizontal speed
         Vector3 vel = rb.linearVelocity;
@@ -408,6 +449,8 @@ public class FleeBall : MonoBehaviour
         if (exploded) return;
         exploded = true;
 
+        StopFuseLoop();
+
         // Spawn FX
         if (explosionPrefab != null)
         {
@@ -417,6 +460,9 @@ public class FleeBall : MonoBehaviour
             if (explosionFxLifetime > 0f)
                 Destroy(fx, explosionFxLifetime);
         }
+
+        // Play random explosion sound
+        PlayExplosionSound();
 
         // Spawn health drop (immediately or after delay)
         if (healthDropPrefab != null)
@@ -444,6 +490,64 @@ public class FleeBall : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    void TryStartFuseLoop()
+    {
+        if (fuseAudioSource == null || fuseLoopClip == null) return;
+        // Consider moving if horizontal speed is above a small threshold
+        Vector3 v = rb != null ? rb.linearVelocity : Vector3.zero;
+        float horizSpeed = new Vector3(v.x, 0f, v.z).magnitude;
+        bool shouldPlay = isFleeing && horizSpeed > 0.1f;
+        if (shouldPlay)
+        {
+            if (!fuseAudioSource.isPlaying || fuseAudioSource.clip != fuseLoopClip)
+            {
+                fuseAudioSource.clip = fuseLoopClip;
+                fuseAudioSource.volume = fuseLoopVolume;
+                fuseAudioSource.minDistance = Mathf.Max(0.01f, fuseMinDistance);
+                fuseAudioSource.maxDistance = Mathf.Max(fuseAudioSource.minDistance, fuseMaxDistance);
+                fuseAudioSource.rolloffMode = fuseRolloffMode;
+                fuseAudioSource.Play();
+            }
+        }
+        else
+        {
+            StopFuseLoop();
+        }
+    }
+
+    void StopFuseLoop()
+    {
+        if (fuseAudioSource != null && fuseAudioSource.isPlaying)
+        {
+            fuseAudioSource.Stop();
+        }
+    }
+
+    void PlayExplosionSound()
+    {
+        AudioClip clip = null;
+        if (explosionClips != null && explosionClips.Length > 0)
+        {
+            int idx = Random.Range(0, explosionClips.Length);
+            clip = explosionClips[idx];
+        }
+        if (clip == null) return;
+        var go = new GameObject("FleeBallExplosionAudio");
+        go.transform.position = transform.position;
+        var src = go.AddComponent<AudioSource>();
+        src.clip = clip;
+        src.volume = explosionVolume;
+        src.spatialBlend = 1f;
+        src.minDistance = 1f;
+        src.maxDistance = Mathf.Max(1f, explosionMaxDistance);
+        src.rolloffMode = explosionRolloffMode;
+        src.playOnAwake = false;
+        src.loop = false;
+        src.Stop();
+        src.Play();
+        Destroy(go, clip.length + 0.1f);
     }
 
     void OnDrawGizmosSelected()

@@ -3108,10 +3108,21 @@ MonoBehaviour:
   bhopSpeedDecayFactor: 1.22
   constantDecayPerSecond: 1.04
   clampGracePeriod: 0.2
+  jumpClips:
+  - {fileID: 8300000, guid: df5902f9d62b6fe4cae446358fa36d44, type: 3}
+  jumpVolume: 1
+  landingClips:
+  - {fileID: 8300000, guid: 6eef4c25dc3b7fc41bee4fabfcc5bff0, type: 3}
+  - {fileID: 8300000, guid: c29cd8073e49fcb479a0b8a266662372, type: 3}
+  - {fileID: 8300000, guid: b55e186502325e5429777357235aac43, type: 3}
+  landingVolume: 1
+  audioMaxDistance: 20
+  audioRolloffMode: 0
   airTurnRate: 14
   preserveAirSpeed: 1
   externalImpulseDecay: 6
   externalHorizontalClamp: 20
+  externalImpulseLockDuration: 2
 --- !u!114 &4419222057944332917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3137,13 +3148,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AmmoSystem
   maxAmmo: 120
-  startingAmmo: 28
+  startingAmmo: 16
   ammoLabel: {fileID: 0}
   ammoSlider: {fileID: 0}
-  pickupSound: {fileID: 0}
-  pickupVolume: 1
-  dryFireSound: {fileID: 0}
-  dryFireVolume: 1
+  pickupSound: {fileID: 8300000, guid: 2368e5dee48b8bf40bd226205343b7e1, type: 3}
+  pickupVolume: 0.2
+  dryFireSound: {fileID: 8300000, guid: 743ac9e4acb6ef4479ff9bae2fdde479, type: 3}
+  dryFireVolume: 0.2
+  playDryFireOnFailedCheck: 1
 --- !u!114 &5978209100862542608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3159,9 +3171,15 @@ MonoBehaviour:
   currentHealth: 100
   healthSlider: {fileID: 0}
   healthLabel: {fileID: 0}
-  gameOverSceneName: Title Screen
+  gameOverSceneName: TitleScreen
   gameOverSceneAsset: {fileID: 102900000, guid: 8ad5b74c52851439aa85329e34d52c1a, type: 3}
   deathDelay: 0.5
+  damageSound: {fileID: 8300000, guid: 4c3a23e45dade52428f9a2b2d485afa6, type: 3}
+  damageVolume: 0.3
+  healSound: {fileID: 8300000, guid: 28743cd9e43a4584dbb539b224ea4110, type: 3}
+  healVolume: 0.6
+  deathSound: {fileID: 8300000, guid: 4edb352a036d65149becc9a181c79734, type: 3}
+  deathVolume: 0.7
 --- !u!1 &7155658872154737126
 GameObject:
   m_ObjectHideFlags: 0
@@ -3373,6 +3391,11 @@ MonoBehaviour:
   enemyKillPoints: 100
   fleerKillPoints: 150
   damageHitPoints: 10
+  gunshotClips:
+  - {fileID: 8300000, guid: 8cf589a681ffaa440ba234d13475f880, type: 3}
+  gunshotVolume: 0.21
+  gunshotMaxDistance: 50
+  gunshotRolloffMode: 1
   aimWeight: 0
   aimRecoilMultiplier: 0.6
   weaponLocalRecoil: {fileID: 0}
