@@ -1954,7 +1954,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f458472096221824691d3d36a9ce3e2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FuseLockedLevelExit
-  nextLevelName: TitleScreen
+  nextLevelName: WinScreen
   lockedColor: {r: 1, g: 0, b: 0, a: 0.12156863}
   unlockedColor: {r: 0, g: 1, b: 0, a: 0.5529412}
   unlockedEffectPrefab: {fileID: 3006689323194374883, guid: 8c42769aa0da4c348be12a8932a6b88c, type: 3}
