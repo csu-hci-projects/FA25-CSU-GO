@@ -197,7 +197,7 @@ MonoBehaviour:
   explosionFxLifetime: 2
   explosionScale: 1
   explosionForce: 2
-  explosionUpBoost: 2
+  explosionUpBoost: 1.6
   explosionRadius: 2.1
   explosionDamage: 10
   explosionFuseTime: 8
@@ -214,8 +214,8 @@ MonoBehaviour:
     m_Bits: 8
   dropRaycastAbove: 3
   dropRaycastBelow: 10
-  knockbackMaxHorizontalSpeed: 36
-  knockbackMaxUpSpeed: 18
+  knockbackMaxHorizontalSpeed: 14
+  knockbackMaxUpSpeed: 9
   pathUpdateInterval: 0.4
   waypointReachDistance: 1.5
   navMeshHeightOffset: 0.5
@@ -246,7 +246,7 @@ MonoBehaviour:
   explosionClips:
   - {fileID: 8300000, guid: 1b37565976f570c4fa9dd10ba95b3a20, type: 3}
   - {fileID: 8300000, guid: 427f53f11b2bb8e498b3393b19f1ad8a, type: 3}
-  explosionVolume: 0.5
+  explosionVolume: 0.185
   explosionMaxDistance: 60
   explosionRolloffMode: 1
 --- !u!114 &9223322008830706856

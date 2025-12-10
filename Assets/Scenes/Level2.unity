@@ -2818,7 +2818,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2545100091055520539, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 131
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 3581316754803674377, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_Pivot.x
@@ -2904,6 +2904,13 @@ PrefabInstance:
       propertyPath: targetRb
       value: 
       objectReference: {fileID: 352002346}
+    - target: {fileID: 4528949667049741849, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_text
+      value: 'Avoid Bombs that do damage!
+
+        Destroy Rollers and Bombs to achieve
+        Score Goal!'
+      objectReference: {fileID: 0}
     - target: {fileID: 4948213782484802710, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -15.900085

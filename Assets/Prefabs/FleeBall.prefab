@@ -213,7 +213,7 @@ MonoBehaviour:
   explosionClips:
   - {fileID: 8300000, guid: 427f53f11b2bb8e498b3393b19f1ad8a, type: 3}
   - {fileID: 8300000, guid: 1b37565976f570c4fa9dd10ba95b3a20, type: 3}
-  explosionVolume: 0.5
+  explosionVolume: 0.2
   explosionMaxDistance: 60
   explosionRolloffMode: 1
   deactivatedMaterial: {fileID: 2100000, guid: b242c006026397d4d845f834bc054911, type: 2}

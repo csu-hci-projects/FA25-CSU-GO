@@ -398,19 +398,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1973028971032053693, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -24.37326
+      value: -2.2014318
       objectReference: {fileID: 0}
     - target: {fileID: 1973028971032053693, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 64.61504
+      value: 1.8283193
       objectReference: {fileID: 0}
     - target: {fileID: 1973028971032053693, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5270232
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1973028971032053693, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.84985095
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3095174120971164891, guid: 5226143ac7b5daf45b3ba2872f65924d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -985,7 +985,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2545100091055520539, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 140
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 3581316754803674377, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_Pivot.x
@@ -1071,6 +1071,13 @@ PrefabInstance:
       propertyPath: targetRb
       value: 
       objectReference: {fileID: 2064382654}
+    - target: {fileID: 4528949667049741849, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_text
+      value: 'Avoid Bombs that do damage!
+
+        Destroy Rollers and Bombs to achieve
+        Score Goal!'
+      objectReference: {fileID: 0}
     - target: {fileID: 4948213782484802710, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -15.900116
