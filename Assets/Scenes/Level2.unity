@@ -1211,6 +1211,58 @@ MonoBehaviour:
   unlockedEffectPrefab: {fileID: 3006689323194374883, guid: 8c42769aa0da4c348be12a8932a6b88c, type: 3}
   lockedSound: {fileID: 0}
   unlockedSound: {fileID: 0}
+--- !u!1 &611610032 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3013871082523556456, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+  m_PrefabInstance: {fileID: 1781826720}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &612140425
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 612140427}
+  - component: {fileID: 612140426}
+  m_Layer: 0
+  m_Name: TimerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &612140426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612140425}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad9f7adefc9a25d4c9b9b90de989c046, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameTimer
+  timerText: {fileID: 1781826724}
+  startOnAwake: 1
+  showHundredths: 1
+--- !u!4 &612140427
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612140425}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -6.6627502, y: 43.79277, z: 29.072336}
+  m_LocalScale: {x: 0.79391634, y: 0.79391634, z: 0.79391634}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &710901157
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2864,10 +2916,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -14.000061
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5997098960231306472, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3013871082523556456, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1781826727}
     - targetCorrespondingSourceObject: {fileID: 6824684715553208671, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 524850423}
@@ -2905,6 +2961,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &1781826724 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5758339132973758449, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+  m_PrefabInstance: {fileID: 1781826720}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611610032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &1781826727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611610032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58f3218dc07c44b49939f95b53710c52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
 --- !u!4 &1907353767 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4000013809632866, guid: ddd81253dc6e4d2478873aeebdbcb4cf, type: 3}
@@ -3325,3 +3404,4 @@ SceneRoots:
   - {fileID: 424206066}
   - {fileID: 1640196757}
   - {fileID: 1738765109}
+  - {fileID: 612140427}

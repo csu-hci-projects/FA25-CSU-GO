@@ -3,27 +3,36 @@ using TMPro;
 
 public class GameTimer : MonoBehaviour
 {
+    public static GameTimer Instance;
+
     [Header("UI Reference")]
-    [Tooltip("TextMeshPro component to display the timer")]
-    [SerializeField] TextMeshProUGUI timerText;
+    [Tooltip("This will be auto-filled by the Connector script in each level")]
+    public TextMeshProUGUI timerText; // Made public so Connector can access it
 
     [Header("Timer Settings")]
-    [Tooltip("Should the timer start automatically when the scene loads?")]
     [SerializeField] bool startOnAwake = true;
-    
-    [Tooltip("Format: 'mm:ss' or 'mm:ss.ff' (ff = hundredths)")]
     [SerializeField] bool showHundredths = false;
 
     private float elapsedTime = 0f;
     private bool isRunning = false;
 
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
-        if (startOnAwake)
-        {
-            StartTimer();
-        }
-        UpdateDisplay();
+        if (startOnAwake) StartTimer();
     }
 
     void Update()
@@ -35,35 +44,24 @@ public class GameTimer : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Start or resume the timer
-    /// </summary>
-    public void StartTimer()
+    // --- NEW FUNCTION: Allows the UI to connect itself ---
+    public void RegisterTimerText(TextMeshProUGUI newText)
     {
-        isRunning = true;
+        timerText = newText;
+        UpdateDisplay(); // Force an immediate update so it doesn't say "TIMER"
+    }
+    // ----------------------------------------------------
+
+    public void StartTimer() { isRunning = true; }
+    public void PauseTimer() { isRunning = false; }
+    
+    public void ResetTimer() 
+    { 
+        elapsedTime = 0f; 
+        isRunning = false; 
+        UpdateDisplay(); 
     }
 
-    /// <summary>
-    /// Pause the timer
-    /// </summary>
-    public void PauseTimer()
-    {
-        isRunning = false;
-    }
-
-    /// <summary>
-    /// Reset the timer to 0 and stop it
-    /// </summary>
-    public void ResetTimer()
-    {
-        elapsedTime = 0f;
-        isRunning = false;
-        UpdateDisplay();
-    }
-
-    /// <summary>
-    /// Reset to 0 and immediately start counting
-    /// </summary>
     public void RestartTimer()
     {
         elapsedTime = 0f;
@@ -71,21 +69,7 @@ public class GameTimer : MonoBehaviour
         UpdateDisplay();
     }
 
-    /// <summary>
-    /// Get the current elapsed time in seconds
-    /// </summary>
-    public float GetElapsedTime()
-    {
-        return elapsedTime;
-    }
-
-    /// <summary>
-    /// Check if timer is currently running
-    /// </summary>
-    public bool IsRunning()
-    {
-        return isRunning;
-    }
+    public float GetElapsedTime() { return elapsedTime; }
 
     void UpdateDisplay()
     {
