@@ -3239,6 +3239,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2545100091055520539, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2545100091055520539, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 222
+      objectReference: {fileID: 0}
     - target: {fileID: 3581316754803674377, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -3323,6 +3331,21 @@ PrefabInstance:
       propertyPath: targetRb
       value: 
       objectReference: {fileID: 2064382644}
+    - target: {fileID: 4528949667049741849, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_text
+      value: 'Avoid Bombs that do damage!
+
+        Destroy Rollers and Bombs to achieve
+        Score Goal!'
+      objectReference: {fileID: 0}
+    - target: {fileID: 4528949667049741849, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_margin.z
+      value: -186.08234
+      objectReference: {fileID: 0}
+    - target: {fileID: 4528949667049741849, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4911624320423782570, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 17.599976
@@ -3333,7 +3356,7 @@ PrefabInstance:
       objectReference: {fileID: 2064382644}
     - target: {fileID: 4948213782484802710, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -15.900024
+      value: -15.899994
       objectReference: {fileID: 0}
     - target: {fileID: 6797276334112723373, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_Name
@@ -3343,16 +3366,45 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7171391346026889218, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_text
+      value: NEED x score to win!
+      objectReference: {fileID: 0}
     - target: {fileID: 7603826701340434125, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -41.69995
+      objectReference: {fileID: 0}
+    - target: {fileID: 7603826701340434125, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -13.9999695
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 4028797409585496727, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6824684715553208671, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9175814602834983301}
   m_SourcePrefab: {fileID: 100100000, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+--- !u!1 &9175814602834983300 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6824684715553208671, guid: a96407b244c803745ae9257dbbd4920d, type: 3}
+  m_PrefabInstance: {fileID: 9175814602834983299}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9175814602834983301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9175814602834983300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad47c8d9a8c8c4fdb96ff907dc6be5f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  delay: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
